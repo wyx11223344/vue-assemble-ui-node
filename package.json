@@ -4,7 +4,8 @@
   "description": "vue一个自主定义ui框架的平台",
   "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "serve-start": "forever start ./bin/www"
   },
   "keywords": [
     "vue、ui"
