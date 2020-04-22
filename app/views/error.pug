@@ -1,0 +1,21 @@
+extends layouts/layout
+
+block content
+  div(class="error-main f-becenter")
+    div(class="loading f-mt20") ERROR
+    script(type='text/javascript').
+      "use strict";
+      var loading = document.querySelector( ".loading" );
+      var letters = loading.textContent.split( "" );
+      loading.textContent = "";
+      letters.forEach( function ( letter , i ) {
+        var span = document.createElement( "span" );
+        span.textContent = letter;
+        span.style.animationDelay = i / 10 + "s";
+        loading.append( span );
+      } );
+    h1(class="error-message")= message
+    h2(class="error-status") 啊偶！#{error.status}了
+    div(class="error-content")
+      img(class="error-img" src="/image/error.gif")
+      pre(class="error-stack") #{error.stack}

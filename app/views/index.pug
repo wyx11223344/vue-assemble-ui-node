@@ -1,0 +1,17 @@
+extends layouts/layout
+
+block content
+  div(class="index-main")
+    div(class="f-becenter loading") WELCOME TO ASSEMBLE
+    img(class="f-becenter index-img" src="/image/welcome.gif")
+    script(type='text/javascript').
+        "use strict";
+        var loading = document.querySelector( ".loading" );
+        var letters = loading.textContent.split( "" );
+        loading.textContent = "";
+        letters.forEach( function ( letter , i ) {
+            var span = document.createElement( "span" );
+            span.textContent = letter;
+            span.style.animationDelay = i / 10 + "s";
+            loading.append( span );
+        } );

@@ -4,7 +4,7 @@
   "description": "vue一个自主定义ui框架的平台",
   "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "nodemon ./bin/www",
     "serve-start": "forever start ./bin/www"
   },
   "keywords": [
@@ -17,12 +17,12 @@
     "cookie-parser": "~1.3.5",
     "debug": "~2.2.0",
     "express": "^4.17.1",
-    "jade": "^1.11.0",
     "morgan": "~1.6.1",
     "mount-controllers": "^1.0.7",
     "mount-middlewares": "^1.0.5",
     "mount-routes": "^1.0.3",
     "mount-services": "^1.0.7",
+    "pug": "^2.0.4",
     "res.api": "^1.0.9"
   },
   "devDependencies": {
