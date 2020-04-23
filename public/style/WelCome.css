@@ -23,12 +23,39 @@ body .loading {
 }
 .loading span {
     display: inline-block;
-    width: 0.7em;
+    min-width: 0.5em;
     text-shadow: 0 1px #bbb, 0 2px #bbb, 0 3px #bbb, 0 4px #bbb, 0 5px #bbb, 0 6px transparent, 0 7px transparent, 0 8px transparent, 0 9px transparent, 0 10px 10px rgba(0, 0, 0, 0.4);
     transform: translateY(20px);
     animation: bounce 0.3s ease infinite alternate;
 }
+.glowIn span {
+    animation: glow-in 0.8s both;
+}
+body .glowIn {
+    color: white;
+    width: 100%;
+    height: 50px;
+    text-align: center;
+    font-size: 50px;
+    top: 500px;
+    -webkit-box-reflect: below 16px -webkit-linear-gradient(transparent,transparent 40%,rgba(255,255,255,0.4));
+}
 
+@keyframes glow-in {
+    from {
+        opacity: 0;
+    }
+    65% {
+        opacity: 1;
+        text-shadow: 0 0 25px white;
+    }
+    75% {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.7;
+    }
+}
 @keyframes bounce {
     to {
         text-shadow: 0 1px #bbb, 0 2px #bbb, 0 3px #bbb, 0 4px #bbb, 0 5px #bbb, 0 6px #bbb, 0 7px #bbb, 0 8px #bbb, 0 9px #bbb, 0 50px 25px rgba(0, 0, 0, 0.2);
