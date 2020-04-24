@@ -13,7 +13,6 @@ var pool = mysql.createPool($dbConfig);
  */
 function responseDoReturn(res, result, resultJSON) {
     if (typeof result === 'undefined') {
-        console.log(123);
         res.json({
             code: '201',
             msg: 'failed to do'

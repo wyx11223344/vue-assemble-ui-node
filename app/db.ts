@@ -1,6 +1,13 @@
 //mysql连接池配置文件
 var mysql = require('mysql');
-var $dbConfig = {
+
+interface IS$dbConfig {
+    host: string,
+    user: string,
+    password: string,
+    database: string
+}
+var $dbConfig: IS$dbConfig = {
 
     host: "36.111.183.168", //这是数据库的地址
 
@@ -20,7 +27,6 @@ var pool = mysql.createPool($dbConfig);
  */
 function responseDoReturn(res, result, resultJSON) {
     if (typeof result === 'undefined') {
-        console.log(123);
         res.json({
             code: '201',
             msg: 'failed to do'

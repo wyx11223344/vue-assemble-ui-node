@@ -4,7 +4,7 @@
   "description": "vue一个自主定义ui框架的平台",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --watch ./ -e ts --exec ts-node bin/www.ts"
+    "start": "nodemon --watch ./ -e ts --exec ts-node-script app/bin/www.ts"
   },
   "keywords": [
     "vue、ui"

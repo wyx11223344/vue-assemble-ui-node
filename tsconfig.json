@@ -3,7 +3,9 @@
     //compilerOptions:编译选项,可以被忽略，这时编译器会使用默认值
     "allowSyntheticDefaultImports": true,
     //允许从没有设置默认导出的模块中默认导入。这并不影响代码的显示，仅为了类型检查。
-    "baseUrl": "./",
+    "baseUrl": "./app",
+    // 编译输出目录，即 .ts 文件编译成 .js 文件后的输出目录。这里设置为根目录下的 /dist 目录
+    "outDir": "./dist",
     //解析非相对模块名的基准目录
     "emitDecoratorMetadata": true,
     //给源码里的装饰器声明加上设计类型元数据

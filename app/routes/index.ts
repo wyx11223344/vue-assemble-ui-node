@@ -1,9 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var templateHTML = require('../template/defaultIframe');
+var db = require('../db');
 
 router.get('/', function(req, res, next) {
-  res.render('index');
+  // res.render('index');
+  //查询users表
+  db.query("SELECT * FROM users",function(results,fields){
+    res.end(JSON.stringify(fields));
+  })
 });
 
 router.get('/index.html', function(req, res, next) {
