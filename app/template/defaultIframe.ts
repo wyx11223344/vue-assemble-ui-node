@@ -1,4 +1,4 @@
-exports.startHTML = '<!DOCTYPE html>\n' +
+const startHTML = '<!DOCTYPE html>\n' +
     '<html lang="en">\n' +
     '    <head>\n' +
     '        <meta charset="utf-8" />\n' +
@@ -10,7 +10,21 @@ exports.startHTML = '<!DOCTYPE html>\n' +
     '    <body>\n' +
     '        <noscript>\n' +
     '            <strong>We\'re sorry but <%= htmlWebpackPlugin.options.title %> doesn\'t work properly without JavaScript enabled. Please enable it to continue.</strong>\n' +
-    '        </noscript>\n'
+    '        </noscript>\n';
 
-exports.endHTML =   '    </body>\n' +
-    '</html>\n'
+const endHTML = '    </body>\n' +
+    '</html>\n';
+
+export default class TemplateHTML {
+    startHTML: string
+    endHTML: string
+
+    /**
+     * 构造函数
+     */
+    constructor() {
+        this.startHTML = startHTML;
+        this.endHTML = endHTML;
+    }
+
+}

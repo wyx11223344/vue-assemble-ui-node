@@ -1,70 +1,86 @@
-//mysql连接池配置文件
-var mysql = require('mysql');
+// mysql连接池配置文件
+import * as mysql from 'mysql';
 
-interface IS$dbConfig {
-    host: string,
-    user: string,
-    password: string,
-    database: string
-}
-var $dbConfig: IS$dbConfig = {
+const $dbConfig: mysql.ConnectionConfig = {
 
-    host: "36.111.183.168", //这是数据库的地址
+    host: '36.111.183.168', // 这是数据库的地址
 
-    user: "vueAssemble", //需要用户的名字
+    user: 'vueAssemble', // 需要用户的名字
 
-    password: "123321sxy?", //用户密码 ，如果你没有密码，直接双引号就是
+    password: '123321sxy?', // 用户密码 ，如果你没有密码，直接双引号就是
 
-    database: "vueAssemble" //数据库名字
+    database: 'vueAssemble' // 数据库名字
 
-}
-
-// 使用连接池，避免开太多的线程，提升性能
-var pool = mysql.createPool($dbConfig);
-
-/**
- * 对query执行的结果自定义返回JSON结果
- */
-function responseDoReturn(res, result, resultJSON) {
-    if (typeof result === 'undefined') {
-        res.json({
-            code: '201',
-            msg: 'failed to do'
-        });
-    } else {
-        res.json(result);
-    }
 };
 
+// 使用连接池，避免开太多的线程，提升性能
+const pool: mysql.Pool = mysql.createPool($dbConfig);
+
 /**
- * 封装query之sql带不占位符func
+ * 封装query之sql不带带占位符func
+ * @param {String} sql 执行sql
+ * @param {Function} callback 执行回调方法
+ * @returns {void}
  */
-function query(sql, callback) {
-    pool.getConnection(function(err, connection) {
-        connection.query(sql, function(err, rows) {
-            callback(err, rows);
-            //释放链接
-            connection.release();
-        });
-    });
+function query(
+    sql: string | mysql.Query,
+    callback: mysql.queryCallback
+): void {
+    pool.getConnection(
+        function(
+            err: mysql.MysqlError,
+            connection: mysql.PoolConnection
+        ): void {
+            connection.query(
+                sql,
+                function(
+                    err: mysql.MysqlError,
+                    rows: any
+                ) {
+                    callback(err, rows);
+                    // 释放链接
+                    connection.release();
+                }
+            );
+        }
+    );
 }
 
 /**
- * 封装query之sql带占位符func
+ * 封装query之sql不带带占位符func
+ * @param {String} sql 执行sql
+ * @param {*} args 传入占位符
+ * @param {Function} callback 执行回调方法
+ * @returns {void}
  */
-function queryArgs(sql, args, callback) {
-    pool.getConnection(function(err, connection) {
-        connection.query(sql, args, function(err, rows) {
-            callback(err, rows);
-            //释放链接
-            connection.release();
-        });
-    });
+function queryArgs(
+    sql: string,
+    args: any,
+    callback: mysql.queryCallback
+): void {
+    pool.getConnection(
+        function(
+            err: mysql.MysqlError,
+            connection: mysql.PoolConnection
+        ): void {
+            connection.query(
+                sql,
+                args,
+                function(
+                    err: mysql.MysqlError,
+                    rows: any
+                ) {
+                    callback(err, rows);
+                    // 释放链接
+                    connection.release();
+                }
+            );
+        }
+    );
 }
 
-//exports
+// exports
 module.exports = {
     query: query,
-    queryArgs: queryArgs,
-    doReturn: responseDoReturn
-}
+    queryArgs: queryArgs
+};

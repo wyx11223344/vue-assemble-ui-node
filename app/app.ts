@@ -1,60 +1,99 @@
-require('./db')
+import * as express from 'express';
+import * as path from 'path';
+import * as logger from 'morgan';
+import * as cookieParser from 'cookie-parser';
+import * as bodyParser from 'body-parser';
+import * as resApi from 'res.api';
+import loaderJs from './routes/loader';
 
-var express       = require('express');
-var path          = require('path');
-var logger        = require('morgan');
-var cookieParser  = require('cookie-parser');
-var bodyParser    = require('body-parser');
-var res_api       = require('res.api');
-var loaderjs      = require('./routes/loader');
-
-var app = express();
-
-app.use(res_api);
-
-// view engine setup
-app.set('views', path.join(__dirname, '../views'));
-app.set('view engine', 'pug');
-
-// uncomment after placing your favicon in /public
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../public')));
-app.use('/', loaderjs);
-
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err['status'] = 404;
-    next(err);
-});
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 404);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
+interface BackError extends Error{
+    status: number;
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+/**
+ * 资源访问错误
+ * @param {Object} req 请求对象
+ * @param {Object} res 返回对象
+ * @param {Function} next 下一步执行方法
+ * @returns {void}
+ */
+function errorNew(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+): void {
+    const err = new Error('Not Found');
+    err['status'] = 404;
+    next(err);
+}
+
+/**
+ * 访问错误处理
+ * @param {Object} err 报错内容
+ * @param {Object} req 请求对象
+ * @param {Object} res 返回对象
+ * @returns {void}
+ */
+function errorHandle(
+    err: BackError,
+    req: express.Request,
+    res: express.Response
+): void {
+    // eslint-disable-next-line no-magic-numbers
     res.status(err.status || 404);
     res.render('error', {
         message: err.message,
-        error: {}
+        error: err
     });
-});
+}
 
+export default class Server {
+    app: express.Application;
 
-module.exports = app;
+    /**
+     * 构造函数
+     */
+    constructor() {
+        this.app = express();
+
+        this.config();
+
+        this.routes();
+
+        this.handlers();
+    }
+
+    /**
+     * 基础配置
+     * @returns {void}
+     */
+    config(): void {
+        this.app.use(resApi);
+        this.app.set('views', path.join(__dirname, '../views'));
+        this.app.set('view engine', 'pug');
+        this.app.use(logger('dev'));
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({ extended: false }));
+        this.app.use(cookieParser());
+        this.app.use(express.static(path.join(__dirname, '../public')));
+    }
+
+    /**
+     * 路由配置
+     * @returns {void}
+     */
+    routes(): void {
+        this.app.use('/', loaderJs);
+    }
+
+    /**
+     * 意外请求中间件处理配置
+     * @returns {void}
+     */
+    handlers(): void {
+
+        this.app.use(errorNew);
+
+        this.app.use(errorHandle);
+    }
+}
