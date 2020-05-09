@@ -86,4 +86,4 @@ server.listen(port);
 server.on('error', dysfunction.onError.bind(dysfunction));
 server.on('listening', dysfunction.onListening.bind(dysfunction));
 
-console.log('服务开启成功:' + port);
+console.log('服务开启成功:http://localhost:' + port);

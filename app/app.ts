@@ -12,9 +12,9 @@ interface BackError extends Error{
 
 /**
  * 资源访问错误
- * @param {Object} req 请求对象
- * @param {Object} res 返回对象
- * @param {Function} next 下一步执行方法
+ * @param {express.Request} req 请求对象
+ * @param {express.Response} res 返回对象
+ * @param {express.NextFunction} next 下一步执行方法
  * @returns {void}
  */
 function errorNew(
@@ -29,9 +29,9 @@ function errorNew(
 
 /**
  * 访问错误处理
- * @param {Object} err 报错内容
- * @param {Object} req 请求对象
- * @param {Object} res 返回对象
+ * @param {BackError} err 报错内容
+ * @param {express.Request} req 请求对象
+ * @param {express.Response} res 返回对象
  * @returns {void}
  */
 function errorHandle(
