@@ -22,10 +22,7 @@
     "debug": "~2.2.0",
     "express": "^4.17.1",
     "morgan": "~1.6.1",
-    "mount-controllers": "^1.0.7",
-    "mount-middlewares": "^1.0.5",
     "mount-routes": "^1.0.3",
-    "mount-services": "^1.0.7",
     "pug": "^2.0.4",
     "res.api": "^1.0.9",
     "typescript": "^3.8.3"
