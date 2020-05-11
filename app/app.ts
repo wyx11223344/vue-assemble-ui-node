@@ -4,7 +4,7 @@ import * as logger from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
 import * as resApi from 'res.api';
-import * as mount from 'mount-routes';
+import loaderJs from './routes/loader';
 
 interface BackError extends Error{
     status: number;
@@ -83,7 +83,7 @@ export default class Server {
      * @returns {void}
      */
     routes(): void {
-        mount(this.app, __dirname + '/routes');
+        this.app.use('/', loaderJs);
     }
 
     /**
