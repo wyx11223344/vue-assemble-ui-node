@@ -21,15 +21,6 @@ const endHTML = '    </body>\n' +
     '</html>\n';
 
 export default class TemplateHTML {
-    startHTML: string
-    endHTML: string
-
-    /**
-     * 构造函数
-     */
-    constructor() {
-        this.startHTML = startHTML;
-        this.endHTML = endHTML;
-    }
-
+    static startHTML: string = startHTML
+    static endHTML: string = endHTML
 }

@@ -14,8 +14,6 @@
     "module": "commonjs",
     //指定生成哪个模块系统代码
     "moduleResolution": "node",
-    //决定如何处理模块。或者是"Node"对于Node.js/io.js，或者是"Classic"（默认）
-    "noEmitHelpers": true,
     //不再输出文件中生成用户自定义的帮助函数代码，如__extends。
     "noImplicitAny": false,
     //在表达式和声明上有隐含的any类型时报错
@@ -35,7 +33,8 @@
     "lib": [
       //编译过程中需要引入的库文件的列表
       "dom",
-      "es6"
+      "es6",
+      "es7"
     ]
   },
   "exclude": [

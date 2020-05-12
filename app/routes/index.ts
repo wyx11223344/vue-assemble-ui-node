@@ -6,68 +6,48 @@
 import * as express from 'express';
 import TemplateHTML from '../template/defaultIframe';
 import usersMapper from '../mapper/usersMapper';
-import MyRedis from '../cache';
+import {RouterDec, MyType} from "../decorators/routerDec";
 
-function Path(target:any) {
-    console.log("I am decorator.")
-}
+const routerDec: RouterDec = new RouterDec();
 
-@Path
-class HelloService {}
-
+@routerDec.BaseRequest('')
 class Index {
-    router: express.Router
-    templateHTML: TemplateHTML
 
     /**
-     * 构造router对象
+     * 首页渲染
+     * @param {express.Request} req 请求
+     * @param {express.Response} res 返回
+     * @returns {Promise<void>} async异步
      */
-    constructor() {
-        this.router = express.Router();
-        this.templateHTML = new TemplateHTML();
-
-        this.route();
-
-        this.shiyishi();
+    @routerDec.RequestMapping('/', MyType.get)
+    async welCome(
+        req: express.Request,
+        res: express.Response
+    ): Promise<void> {
+        const ceshi = await usersMapper.getAllUser();
+        res.render('index', ceshi);
     }
 
-    shiyishi() {
-        console.log(1111);
-    }
-
-    route() {
-        this.router.get(
-            '/',
-            function(
-                req: express.Request,
-                res: express.Response
-            ): void {
-                console.log(MyRedis);
-                console.log(MyRedis.prototype);
-                usersMapper.getAllUser()
-                    .then((ceshi) => {
-                        res.render('index', ceshi);
-                    });
-            });
-
-        this.router.get(
-            '/index.html',
-            function(
-                req: express.Request,
-                res: express.Response
-            ): void {
-                res.writeHead(200, {
-                    'Content-Type': 'text/html',
-                    'Expires': new Date().toUTCString()
-                });
-                res.write(this.templateHTML.startHTML);
-                res.write('测试\n');
-                res.end(this.templateHTML.endHTML);
-            });
+    /**
+     * 返回标准html页面方法
+     * @param {express.Request} req 请求
+     * @param {express.Response} res 返回
+     * @returns {Promise<void>} async异步
+     */
+    @routerDec.RequestMapping('/index.html', MyType.get)
+    async backHtml(
+        req: express.Request,
+        res: express.Response
+    ): Promise<void> {
+        res.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Expires': new Date().toUTCString()
+        });
+        res.write(TemplateHTML.startHTML);
+        res.write('测试\n');
+        res.end(TemplateHTML.endHTML);
     }
 
 }
 
-
-
-export default new Index();
+export default routerDec;

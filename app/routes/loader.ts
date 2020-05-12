@@ -48,11 +48,7 @@ export default class MyRouter {
                         import(`.${routeUrl}/${file.split('.')[0]}`)
                             .then((route) => {
                                 route = route.default.router;
-                                if (file.split('.')[0] === 'index'){
-                                    this.router.use(`${routeUrl}/`, route);
-                                } else {
-                                    this.router.use(`${routeUrl}/${file.split('.')[0]}`, route);
-                                }
+                                this.router.use(`/`, route);
                             })
                             .catch((e) => {
                                 console.log(e);
