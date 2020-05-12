@@ -8,6 +8,13 @@ import TemplateHTML from '../template/defaultIframe';
 import usersMapper from '../mapper/usersMapper';
 import MyRedis from '../cache';
 
+function Path(target:any) {
+    console.log("I am decorator.")
+}
+
+@Path
+class HelloService {}
+
 class Index {
     router: express.Router
     templateHTML: TemplateHTML
@@ -20,6 +27,12 @@ class Index {
         this.templateHTML = new TemplateHTML();
 
         this.route();
+
+        this.shiyishi();
+    }
+
+    shiyishi() {
+        console.log(1111);
     }
 
     route() {
