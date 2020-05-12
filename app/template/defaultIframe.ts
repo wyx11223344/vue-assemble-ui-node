@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/5/12
+ * @Description: 基础返回页面类
+*/
 const startHTML = '<!DOCTYPE html>\n' +
     '<html lang="en">\n' +
     '    <head>\n' +

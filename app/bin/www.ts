@@ -1,13 +1,34 @@
-#!/usr/bin/env node
-import Server from '../app';
+/**
+ * @author WYX
+ * @date 2020/5/12
+ * @Description: 服务启动类
+*/
+import {App, Server} from '../app';
 import * as debug from 'debug';
 import * as http from 'http';
-
-const app = (new Server()).app;
 
 class WwwFunction {
     port: number | string | boolean
     server: http.Server
+    app: App
+
+    /**
+     * 构建函数
+     */
+    constructor() {
+        this.app = (new Server()).app;
+        const port: number | string | boolean = this.normalizePort(process.env.PORT || '9988');
+
+        this.app.set('port', port);
+        const server: http.Server = http.createServer(this.app);
+
+        this.server = server;
+        server.listen(port);
+        server.on('error', this.onError.bind(this));
+        server.on('listening', this.onListening.bind(this));
+
+        console.log('服务开启成功:http://localhost:' + port);
+    }
 
     /**
      * 处理端口号
@@ -74,16 +95,4 @@ class WwwFunction {
     }
 }
 
-const dysfunction: WwwFunction = new WwwFunction();
-
-const port: number | string | boolean = dysfunction.normalizePort(process.env.PORT || '9988');
-
-app.set('port', port);
-const server: http.Server = http.createServer(app);
-
-dysfunction.server = server;
-server.listen(port);
-server.on('error', dysfunction.onError.bind(dysfunction));
-server.on('listening', dysfunction.onListening.bind(dysfunction));
-
-console.log('服务开启成功:http://localhost:' + port);
+export default new WwwFunction();
