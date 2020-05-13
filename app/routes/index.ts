@@ -7,6 +7,7 @@ import * as express from 'express';
 import TemplateHTML from '../template/defaultIframe';
 import usersMapper from '../mapper/usersMapper';
 import {RouterDec, MyType} from "../decorators/routerDec";
+import UsersServices from "../services/usersServices";
 
 const routerDec: RouterDec = new RouterDec();
 
@@ -25,6 +26,7 @@ class Index {
         res: express.Response
     ): Promise<void> {
         const ceshi = await usersMapper.getAllUser();
+        UsersServices.getUserInfo();
         res.render('index', ceshi);
     }
 

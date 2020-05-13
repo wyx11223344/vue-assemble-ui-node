@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/5/13
+ * @Description: 路由注册修饰器类
+*/
 import * as express from "express";
 
 export enum MyType {
@@ -20,7 +25,7 @@ export class RouterDec {
         this.router = express.Router();
     }
 
-    BaseRequest(path: string) {
+    BaseRequest(path: string): ClassDecorator {
         return (constructor: Function) => {
             this.baseUrl = path;
             this.routerList.forEach((item) => {
@@ -29,7 +34,7 @@ export class RouterDec {
         }
     }
 
-    RequestMapping(path: string, type: MyType) {
+    RequestMapping(path: string, type: MyType): MethodDecorator {
         return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
             this.routerList.push({
                 type: type,

@@ -100,9 +100,21 @@ class MyRedis {
      * @param {Array<String>} argList 需要查询的数组
      * @returns {Promise<any>} 返回查询结果
      */
-    static hmget(key, argList: Array<string>): Promise<string> {
+    static hmget(key: string, argList: Array<string>): Promise<string> {
         return this.getFun((fn: Callback<string[]>) => {
             this.redisClient.hmget(key, argList, fn);
+        });
+    }
+
+    /**
+     * 多个key获取  hash
+     * @param {String} key hash设置键
+     * @param {Array<String>} argList 需要查询的数组
+     * @returns {Promise<any>} 返回查询结果
+     */
+    static hgetall(key: string): Promise<string> {
+        return this.getFun((fn: Callback<{ [key: string]: string }>) => {
+            this.redisClient.hgetall(key, fn);
         });
     }
 
