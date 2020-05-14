@@ -13,4 +13,11 @@ const $redisConfig: redis.ClientOpts = {
 
 };
 
+export const $redisOutTime = {
+
+    outTime: 60 * 30
+
+};
+
 export default $redisConfig;
+

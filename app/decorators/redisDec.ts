@@ -4,6 +4,7 @@
  * @Description: redis注解类
 */
 import MyRedis from '../cache';
+import {$redisOutTime} from '../config/configRedis';
 
 interface CacheType {
     time: number;
@@ -19,7 +20,7 @@ export default class RedisDec {
      * @param {Number} outTime 过期时间
      * @returns {MethodDecorator} 返回方法
      */
-    static Cacheable(key: string, params = 'redis', outTime = 60): MethodDecorator {
+    static Cacheable(key: string, params = 'redis', outTime = $redisOutTime.outTime): MethodDecorator {
         return (target: any, propertyKey: string, descriptor: PropertyDescriptor): void => {
             // 保存现有方法
             const setFunction = descriptor.value;
