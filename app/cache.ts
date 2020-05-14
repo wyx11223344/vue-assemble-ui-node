@@ -3,10 +3,9 @@
  * @date 2020/5/12
  * @Description: 对常用进行了封装（未封装无序和有序的内容）MyRedis类
  * 注: 对于ts类型检测，调用getFun方法的类型检测有问题(所以使用any),多重调用后类型检测的包含关系混乱
-*/
+ */
 import * as Redis from 'redis';
 import $redisConfig from './config/configRedis';
-import {Callback} from "redis";
 
 const redisClient = Redis.createClient($redisConfig);
 
@@ -37,9 +36,9 @@ class MyRedis {
      * @returns {Promise<String>} 返回值
      */
     static get(key): Promise<string> {
-        return this.getFun((fn: Callback<string>) => {
+        return this.getFun((fn: Redis.Callback<string>) => {
             this.redisClient.get(key, fn);
-        })
+        }) as Promise<string>;
     }
 
     /**
@@ -64,8 +63,8 @@ class MyRedis {
     /**
      * 单个key存储  hash
      * @param {String} key 设置键
-     * @param {String} value hash的值
      * @param {String} field hash的key
+     * @param {String} value hash的值
      * @returns {void}
      */
     static hset(key: string, field: string, value: string): void {
@@ -79,9 +78,9 @@ class MyRedis {
      * @returns {void}
      */
     static hget(key: string, field: string): Promise<string> {
-        return this.getFun((fn: Callback<string>) => {
+        return this.getFun((fn: Redis.Callback<string>) => {
             this.redisClient.hget(key, field, fn);
-        });
+        }) as Promise<string>;
     }
 
     /**
@@ -90,7 +89,7 @@ class MyRedis {
      * @param {Object} argObj 需要传入的对象(暂时只封装对象传输)
      * @returns {void}
      */
-    static hmset(key: string, argObj: {[key: string]: string|number}): void {
+    static hmset(key: string, argObj: { [key: string]: string | number }): void {
         this.redisClient.hmset(key, argObj, this.errFun);
     }
 
@@ -98,29 +97,29 @@ class MyRedis {
      * 多个key获取  hash
      * @param {String} key hash设置键
      * @param {Array<String>} argList 需要查询的数组
-     * @returns {Promise<any>} 返回查询结果
+     * @returns {Promise<string[]>} 返回查询结果
      */
-    static hmget(key: string, argList: Array<string>): Promise<string> {
-        return this.getFun((fn: Callback<string[]>) => {
+    static hmget(key: string, argList: Array<string>): Promise<string[]> {
+        return this.getFun((fn: Redis.Callback<string[]>) => {
             this.redisClient.hmget(key, argList, fn);
-        });
+        }) as Promise<string[]>;
     }
 
     /**
-     * 多个key获取  hash
+     * 全部hash获取
      * @param {String} key hash设置键
-     * @param {Array<String>} argList 需要查询的数组
-     * @returns {Promise<any>} 返回查询结果
+     * @returns {Promise<string[]>} 返回查询结果
      */
-    static hgetall(key: string): Promise<string> {
-        return this.getFun((fn: Callback<{ [key: string]: string }>) => {
+    static hgetall(key: string): Promise<string[]> {
+        return this.getFun((fn: Redis.Callback<{ [key: string]: string }>) => {
             this.redisClient.hgetall(key, fn);
-        });
+        }) as Promise<string[]>;
     }
 
     /**
      * 设定无返回操作错误处理
-     * @param {null|Error} err
+     * @param {null|Error} err 错误
+     * @returns {void}
      */
     private static errFun(err: null | Error): void {
         if (err) {
@@ -130,19 +129,19 @@ class MyRedis {
 
     /**
      * 对获取函数进行Promise封装
-     * @param fn
-     * @returns {Promise<string|string[]>}
+     * @param {Function} fn 传入执行方法
+     * @returns {Promise<string|string[]>} 返回Promise对象
      */
-    private static getFun(fn: Function): Promise<any>{
-        return new Promise<string>((resolve, reject) => {
-            fn((err: null | Error, getRslt: any): void => {
+    private static getFun(fn: Function): Promise<string | string[]> {
+        return new Promise<string | string[]>((resolve, reject): void => {
+            fn((err: null | Error, getRslt: string | string[]): void => {
                 if (err) {
                     reject();
                     throw err;
                 }
                 resolve(getRslt);
-            })
-        })
+            });
+        });
     }
 }
 
