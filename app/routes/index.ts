@@ -7,12 +7,13 @@ import * as express from 'express';
 import TemplateHTML from '../template/defaultIframe';
 import usersMapper from '../mapper/usersMapper';
 import {RouterDec, MyType} from '../decorators/routerDec';
-import UsersServices from '../services/usersServices';
+import UsersServices from '../services/usersServices/usersServices';
 
 const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('')
 export class Index {
+    private UsersServices: UsersServices = new UsersServices()
 
     /**
      * 首页渲染
@@ -26,7 +27,7 @@ export class Index {
         res: express.Response
     ): Promise<void> {
         const ceshi = await usersMapper.getAllUser();
-        await UsersServices.getUserInfo('a2', 'bbbb');
+        await this.UsersServices.getUserInfo('a2', 'bbbb');
         res.render('index', ceshi);
     }
 
@@ -41,7 +42,7 @@ export class Index {
         req: express.Request,
         res: express.Response
     ): Promise<void> {
-        UsersServices.changeUserInfo();
+        this.UsersServices.changeUserInfo();
         res.writeHead(200, {
             'Content-Type': 'text/html',
             'Expires': new Date().toUTCString()

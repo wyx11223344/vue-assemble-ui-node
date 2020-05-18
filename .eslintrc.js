@@ -286,7 +286,7 @@ module.exports = {
         "quotes": [2, "single", "avoid-escape"],
         // 要求使用 JSDoc 注释
         "require-jsdoc": [
-            "error",
+            0,
             {
                 "require": {
                     "FunctionDeclaration": true,

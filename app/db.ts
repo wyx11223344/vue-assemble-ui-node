@@ -7,7 +7,7 @@ import * as mysql from 'mysql';
 import $dbConfig from './config/configMysql';
 
 class MySql{
-    static pool: mysql.Pool = mysql.createPool($dbConfig);
+    private static pool: mysql.Pool = mysql.createPool($dbConfig);
 
     /**
      * 封装query之sql不带带占位符func

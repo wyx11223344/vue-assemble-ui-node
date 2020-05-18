@@ -1,7 +1,7 @@
 /**
  * @author WYX
  * @date 2020/5/13
- * @Description: 路由注册修饰器类
+ * @Description: 路由注册装饰器类
 */
 import * as express from 'express';
 
@@ -46,7 +46,7 @@ export class RouterDec {
      * 注册路由
      * @param {String} path 路由路径
      * @param {MyType} type 请求方式
-     * @returns {MethodDecorator} ts方法修饰器
+     * @returns {MethodDecorator} ts方法装饰器
      */
     RequestMapping(path: string, type: MyType): MethodDecorator {
         return (target: any, propertyKey: string, descriptor: PropertyDescriptor): void => {
