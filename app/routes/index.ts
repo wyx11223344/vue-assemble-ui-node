@@ -13,7 +13,7 @@ const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('')
 export class Index {
-    private UsersServices: UsersServices = new UsersServices()
+    private static UsersServices: UsersServices = new UsersServices()
 
     /**
      * 首页渲染
@@ -27,7 +27,7 @@ export class Index {
         res: express.Response
     ): Promise<void> {
         const ceshi = await usersMapper.getAllUser();
-        await this.UsersServices.getUserInfo('a2', 'bbbb');
+        await Index.UsersServices.getUserInfo('a2', 'bbbb');
         res.render('index', ceshi);
     }
 
@@ -42,7 +42,7 @@ export class Index {
         req: express.Request,
         res: express.Response
     ): Promise<void> {
-        this.UsersServices.changeUserInfo();
+        Index.UsersServices.changeUserInfo();
         res.writeHead(200, {
             'Content-Type': 'text/html',
             'Expires': new Date().toUTCString()
