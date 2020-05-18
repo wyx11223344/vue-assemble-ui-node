@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon --watch ./ -e ts --exec ts-node app/bin/www.ts",
     "dev": "nodemon dist/bin/www.js",
-    "test": "nyc -a mocha --recursive"
+    "test": "tsc && nyc -a mocha --recursive"
   },
   "keywords": [
     "vue、ui"
