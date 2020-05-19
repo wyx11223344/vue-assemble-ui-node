@@ -21,7 +21,7 @@ export class Index {
      * @param {express.Response} res 返回
      * @returns {Promise<void>} async异步
      */
-    @routerDec.RequestMapping('/', MyType.get)
+    // @routerDec.RequestMapping('/', MyType.get)
     async welCome(
         req: express.Request,
         res: express.Response
@@ -37,7 +37,7 @@ export class Index {
      * @param {express.Response} res 返回
      * @returns {Promise<void>} async异步
      */
-    @routerDec.RequestMapping('/index.html', MyType.get)
+    // @routerDec.RequestMapping('/index.html', MyType.get)
     async backHtml(
         req: express.Request,
         res: express.Response
