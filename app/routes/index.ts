@@ -8,6 +8,7 @@ import TemplateHTML from '../template/defaultIframe';
 import usersMapper from '../mapper/usersMapper';
 import {RouterDec, MyType} from '../decorators/routerDec';
 import UsersServices from '../services/usersServices/usersServices';
+import MyRedis from '../cache';
 
 const routerDec: RouterDec = new RouterDec();
 
@@ -37,6 +38,22 @@ export class Index {
      * @param {express.Response} res 返回
      * @returns {Promise<void>} async异步
      */
+    @routerDec.RequestMapping('/setHtml', MyType.post)
+    async setHtml(
+        req: express.Request,
+        res: express.Response
+    ): Promise<void> {
+        MyRedis.set(req.body.findId as string, req.body.sendHtml as string);
+        MyRedis.exp(req.body.findId as string, 10);
+        res.send(true);
+    }
+
+    /**
+     * 返回标准html页面方法
+     * @param {express.Request} req 请求
+     * @param {express.Response} res 返回
+     * @returns {Promise<void>} async异步
+     */
     @routerDec.RequestMapping('/index.html', MyType.get)
     async backHtml(
         req: express.Request,
@@ -47,8 +64,9 @@ export class Index {
             'Content-Type': 'text/html',
             'Expires': new Date().toUTCString()
         });
+        const a = await MyRedis.get(req.query.findId as string);
         res.write(TemplateHTML.startHTML);
-        res.write('测试\n');
+        res.write(a + '\n');
         res.end(TemplateHTML.endHTML);
     }
 
