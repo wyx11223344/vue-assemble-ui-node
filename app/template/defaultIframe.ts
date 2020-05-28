@@ -10,6 +10,7 @@ const startHTML = '<!DOCTYPE html>\n' +
     '        <meta http-equiv="X-UA-Compatible" content="IE=edge" />\n' +
     '        <meta name="referrer" content="no-referrer" />\n' +
     '        <meta name="viewport" content="width=device-width,initial-scale=1.0" />\n' +
+    '        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>' +
     '        <title>基础模板</title>\n' +
     '    </head>\n' +
     '    <body>\n' +
