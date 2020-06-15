@@ -18,7 +18,7 @@ const startHTML = '<!DOCTYPE html>\n' +
     '            <strong>We\'re sorry but <%= htmlWebpackPlugin.options.title %> doesn\'t work properly without JavaScript enabled. Please enable it to continue.</strong>\n' +
     '        </noscript>\n' +
     '    <script>\n' +
-    '        window.addEventListener("keydown", function() { if (e.keyCode === 83 && e.ctrlKey) { window.parent._outObj_.buttonClick(); e.preventDefault(); } }) \n' +
+    '        window.addEventListener("keydown", function(e) { if (e.keyCode === 83 && e.ctrlKey) { window.parent._outObj_.buttonClick(); e.preventDefault(); } }) \n' +
     '    </script>\n';
 
 const endHTML = '    </body>\n' +
