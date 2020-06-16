@@ -75,35 +75,39 @@ export class Index {
             'Expires': new Date().toUTCString()
         });
         const a: string = await MyRedis.get(req.query.findId as string);
-        const aList: HtmlObj[] = JSON.parse(a);
-        let baseObje = {
-            el: ''
-        };
-        let cssStyle = '';
-        let template = '';
-        let listObj = [];
+        res.write(TemplateHTML.startHTML);
 
-        for (let index = 0; index < aList.length; index++) {
-            const item = aList[index];
-            const script: string = Index.getSource(item.html, 'script').replace(/export default/, 'return');
-            if (index === 0) {
-                template = '<div id="app">' + Index.getSource(item.html, 'template') + '</div>';
-                baseObje = new Function(script)();
-                baseObje.el = '#app';
-            } else {
-                listObj.push(new Function(script)());
-                listObj[listObj.length - 1].template = Index.getSource(item.html, 'template');
-                listObj[listObj.length - 1].name = listObj[listObj.length - 1].name ? listObj[listObj.length - 1].name : item.name;
+        if (a) {
+            const aList: HtmlObj[] = JSON.parse(a);
+            let baseObje = {
+                el: ''
+            };
+            let cssStyle = '';
+            let template = '';
+            let listObj = [];
+
+            for (let index = 0; index < aList.length; index++) {
+                const item = aList[index];
+                const script: string = Index.getSource(item.html, 'script').replace(/export default/, 'return');
+                if (index === 0) {
+                    template = '<div id="app">' + Index.getSource(item.html, 'template') + '</div>';
+                    baseObje = new Function(script)();
+                    baseObje.el = '#app';
+                } else {
+                    listObj.push(new Function(script)());
+                    listObj[listObj.length - 1].template = Index.getSource(item.html, 'template');
+                    listObj[listObj.length - 1].name = listObj[listObj.length - 1].name ? listObj[listObj.length - 1].name : item.name;
+                }
+                const style: string = Index.getSource(item.html, 'style');
+                const lessRender: LessRender = await less.render(style);
+                cssStyle += lessRender.css;
             }
-            const style: string = Index.getSource(item.html, 'style');
-            const lessRender: LessRender = await less.render(style);
-            cssStyle += lessRender.css;
+
+            const backJs: string = Index.createJs(baseObje, listObj);
+
+            res.write(`${template}\n${backJs}\n<style>\n${cssStyle}</style>\n`);
         }
 
-        const backJs: string = Index.createJs(baseObje, listObj);
-
-        res.write(TemplateHTML.startHTML);
-        res.write(`${template}\n${backJs}\n<style>\n${cssStyle}</style>\n`);
         res.end(TemplateHTML.endHTML);
     }
 
