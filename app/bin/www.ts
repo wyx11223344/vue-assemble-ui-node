@@ -9,13 +9,13 @@ import * as http from 'http';
 import {UtilsDec} from '../decorators/utilsDec';
 
 // eslint-disable-next-line no-unused-vars,@typescript-eslint/no-unused-vars
-class WwwFunction {
+export default class WwwFunction {
     port: number | string | boolean
     server: http.Server
     app: App
 
     @UtilsDec.newSelf // 初始化自己
-    private static wwwFunction: WwwFunction
+    static wwwFunction: WwwFunction
 
     /**
      * 构建函数
