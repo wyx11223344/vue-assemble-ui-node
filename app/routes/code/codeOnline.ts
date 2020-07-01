@@ -7,12 +7,16 @@ import * as express from 'express';
 import TemplateHTML from '../../template/defaultIframe';
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import MyRedis from '../../cache';
-import CodeOnlineServices from '../../services/codeOnlineServices/codeOnlineServices';
+import CodeOnlineServices from '../../services/codeServices/codeOnlineServices/codeOnlineServices';
+import BaseResponse, {BackType} from '../../models/baseResponse';
+import Codes from '../../models/codes';
+import CodeServices from '../../services/codeServices/codeServices';
 const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('/code/codeOnline')
 export class CodeOnline {
     private static CodeOnlineServices: CodeOnlineServices = new CodeOnlineServices()
+    private static CodeServices: CodeServices = new CodeServices()
 
     /**
      * 返回标准html页面方法
@@ -49,10 +53,30 @@ export class CodeOnline {
             'Content-Type': 'text/html',
             'Expires': new Date().toUTCString()
         });
-        const a: string = await MyRedis.get(req.query.findId as string);
-        res.write(TemplateHTML.startHTML);
-        res.write(await CodeOnline.CodeOnlineServices.dealVueOnlineCode(a));
-        res.end(TemplateHTML.endHTML);
+        try {
+            const a: string = await MyRedis.get(req.query.findId as string);
+            res.write(TemplateHTML.startHTML);
+            res.write(await CodeOnline.CodeOnlineServices.dealVueOnlineCode(a));
+            res.end(TemplateHTML.endHTML);
+        } catch (e) {
+            res.end(e.toString());
+        }
+    }
+
+    @routerDec.RequestMapping('/getTemplate', MyType.post)
+    async getHtmlTemplate(
+        req: express.Request,
+        res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<Codes[]>();
+        try {
+            const componentId: number = req.body.componentId ? Number(req.body.componentId) : 1;
+            response._datas = await CodeOnline.CodeServices.getCodes(componentId);
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = e;
+        }
+        res.json(response);
     }
 
 }

@@ -13,7 +13,6 @@ interface LessRender {
 
 interface HtmlObj {
     name: string;
-    disclose: boolean;
     html: string;
 }
 
@@ -38,29 +37,34 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
 
             for (let index = 0; index < aList.length; index++) {
                 const item = aList[index];
-                const script: string = CodeOnlineServices.getSource(item.html, 'script').replace(/export default/, 'return');
-                if (index === 0) {
-                    template = '<div id="app">' + CodeOnlineServices.getSource(item.html, 'template') + '</div>';
-                    baseObje = new Function(script)();
-                    baseObje.el = '#app';
-                } else {
-                    listObj.push(new Function(script)());
-                    listObj[listObj.length - 1].template = CodeOnlineServices.getSource(item.html, 'template');
-                    listObj[listObj.length - 1].name = listObj[listObj.length - 1].name ? listObj[listObj.length - 1].name : item.name;
-                }
-
-                const style: string = CodeOnlineServices.getSource(item.html, 'style');
                 try {
+                    const script: string = CodeOnlineServices.getSource(item.html, 'script').replace(/export default/, 'return');
+                    if (index === 0) {
+                        template = '<div id="app">' + CodeOnlineServices.getSource(item.html, 'template') + '</div>';
+                        baseObje = new Function(script)();
+                        baseObje.el = '#app';
+                    } else {
+                        listObj.push(new Function(script)());
+                        listObj[listObj.length - 1].template = CodeOnlineServices.getSource(item.html, 'template');
+                        listObj[listObj.length - 1].name = listObj[listObj.length - 1].name ? listObj[listObj.length - 1].name : item.name;
+                    }
+
+                } catch (e) {
+                    return '代码解析失败，请检查';
+                }
+                try {
+                    const style: string = CodeOnlineServices.getSource(item.html, 'style');
                     const lessRender: LessRender = await less.render(style);
                     cssStyle += lessRender.css;
                 } catch (e) {
-                    backString = 'less渲染失败，请检查less是否有位置参数等问题!\n';
+                    return 'less渲染失败，请检查less是否有位置参数等问题!\n';
                 }
             }
 
             const backJs: string = CodeOnlineServices.createJs(baseObje, listObj);
             backString = `${template}\n${backJs}\n<style>\n${cssStyle}</style>\n`;
         }
+
         return backString;
     }
 
