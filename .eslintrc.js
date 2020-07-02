@@ -298,7 +298,7 @@ module.exports = {
             }
         ],
         // 强制要求注释使用jsdoc类型
-        "valid-jsdoc": 2,
+        "valid-jsdoc": 0,
         // 要求或禁止使用分号而不是 ASI（这个才是控制行尾部分号的，）
         "semi": 2,
         // 强制分号之前和之后使用一致的空格

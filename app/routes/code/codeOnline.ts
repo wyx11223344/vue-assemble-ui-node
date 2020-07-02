@@ -22,18 +22,21 @@ export class CodeOnline {
 
     /**
      * 返回标准html页面方法
-     * @param {express.Request} req 请求
-     * @param {express.Response} res 返回
-     * @returns {Promise<void>} async异步
+     * @route POST /code/codeOnline/setHtml
+     * @group 代码在线编辑
+     * @param {string} findId 返回
+     * @param {String} sendHtml 测试
+     * @returns {VoidFunction} async异步
      */
     @routerDec.RequestMapping('/setHtml', MyType.post)
     async setHtml(
-        req: express.Request,
-        res: express.Response
+        @routerDec.RequestParams('String', 'findId') findId: string,
+        @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
+        @routerDec.Response() res: express.Response
     ): Promise<void> {
         try {
-            MyRedis.set(req.body.findId as string, req.body.sendHtml as string);
-            MyRedis.exp(req.body.findId as string, 10);
+            MyRedis.set(findId, sendHtml);
+            MyRedis.exp(findId, 10);
             res.send(true);
         } catch (e) {
             res.send(e);

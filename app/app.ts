@@ -9,6 +9,7 @@ import * as logger from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import * as bodyParser from 'body-parser';
 import * as resApi from 'res.api';
+import * as expressSwaggerFn from 'express-swagger-generator';
 import MyRouter from './routes/loader';
 
 interface BackError extends Error {
@@ -25,6 +26,8 @@ export class Server {
      */
     constructor() {
         this.app = express();
+
+        this.swagger();
 
         this.config();
 
@@ -104,5 +107,40 @@ export class Server {
             message: err.message,
             error: err
         });
+    }
+
+    /**
+     * 初始化swagger
+     * @returns {void}
+     */
+    private swagger(): void {
+        const expressSwagger = expressSwaggerFn(this.app);
+        const options = {
+            swaggerDefinition: {
+                info: {
+                    description: 'This is a sample server',
+                    title: 'Swagger',
+                    version: '1.0.0',
+                },
+                host: 'localhost:9988',
+                basePath: '/',
+                produces: [
+                    'application/json',
+                    'application/xml'
+                ],
+                schemes: ['http', 'https'],
+                securityDefinitions: {
+                    JWT: {
+                        type: 'apiKey',
+                        in: 'header',
+                        name: 'Authorization',
+                        description: '',
+                    }
+                }
+            },
+            basedir: __dirname, // app absolute path
+            files: ['./routes/**/*.ts'] // Path to the API handle folder
+        };
+        expressSwagger(options);
     }
 }

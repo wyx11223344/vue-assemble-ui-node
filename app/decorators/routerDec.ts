@@ -19,6 +19,8 @@ interface RouterSet {
 export class RouterDec {
     router: express.Router
     baseUrl: string
+    ParamsObj: any = {}
+    expressParams: any = {}
     routerList: RouterSet[] = []
 
     /**
@@ -50,11 +52,106 @@ export class RouterDec {
      */
     RequestMapping(path: string, type: MyType): MethodDecorator {
         return (target: any, propertyKey: string, descriptor: PropertyDescriptor): void => {
+            // 保存现有方法
+            const setFunction = descriptor.value;
+
+            descriptor.value = (...arg): void => {
+
+                if (!this.ParamsObj[propertyKey]) {
+                    setFunction(...arg);
+                    return;
+                }
+
+                const paramsList = [];
+
+                Object.keys(this.ParamsObj[propertyKey]).forEach((item) => {
+                    paramsList[this.ParamsObj[propertyKey][item].index] = this.ParamsObj[propertyKey][item].type(arg[0].body[item]);
+                });
+
+                this.expressParams[propertyKey].forEach((item, index) => {
+                    if (item) {
+                        paramsList[item] = arg[index];
+                    }
+                });
+
+                setFunction(...paramsList);
+            };
+
+            // 保存路由
             this.routerList.push({
                 type: type,
                 path: path,
                 fn: descriptor.value
             });
+        };
+    }
+
+    /**
+     * 获取Reuqest
+     * @constructor
+     * @return {Function} 返回方法
+     */
+    Request(): (target: any, propertyKey: string, parameterIndex: number) => void {
+        return (target: any, propertyKey: string, parameterIndex: number): void => {
+            if (!this.expressParams[propertyKey]){
+                this.expressParams[propertyKey] = [parameterIndex, null, null];
+            } else {
+                this.expressParams[propertyKey][0] = parameterIndex;
+            }
+        };
+    }
+
+    /**
+     * 获取Response
+     * @constructor
+     * @return {Function} 返回方法
+     */
+    Response(): (target: any, propertyKey: string, parameterIndex: number) => void {
+        return (target: any, propertyKey: string, parameterIndex: number): void => {
+            if (!this.expressParams[propertyKey]){
+                this.expressParams[propertyKey] = [null, parameterIndex, null];
+            } else {
+                this.expressParams[propertyKey][1] = parameterIndex;
+            }
+        };
+    }
+
+    /**
+     * 获取NextFunction
+     * @constructor
+     * @return {Function} 返回方法
+     */
+    NextFunction(): (target: any, propertyKey: string, parameterIndex: number) => void {
+        return (target: any, propertyKey: string, parameterIndex: number): void => {
+            if (!this.expressParams[propertyKey]){
+                this.expressParams[propertyKey] = [null, null, parameterIndex];
+            } else {
+                this.expressParams[propertyKey][2] = parameterIndex;
+            }
+        };
+    }
+
+    /**
+     * 注册参数
+     * @param {String} type 以什么类型获取
+     * @param {String} name 获取名称
+     * @returns {Function} 返回方法
+     */
+    RequestParams(type: string, name: string): ParameterDecorator {
+        return (target: any, propertyKey: string, parameterIndex: number): void => {
+            if (this.ParamsObj[propertyKey]) {
+                this.ParamsObj[propertyKey][name] = {
+                    type: global[type],
+                    index: parameterIndex
+                };
+            } else {
+                this.ParamsObj[propertyKey] = {
+                    [name]: {
+                        type: global[type],
+                        index: parameterIndex
+                    }
+                };
+            }
         };
     }
 }
