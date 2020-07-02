@@ -5,15 +5,11 @@
 */
 import {CodeOnlineServicesImp} from './codeOnlineServicesImp';
 import * as less from 'less';
+import {HtmlObj} from '../../../types/codes';
 
 interface LessRender {
     css: string;
     imports: [];
-}
-
-interface HtmlObj {
-    name: string;
-    html: string;
 }
 
 export default class CodeOnlineServices implements CodeOnlineServicesImp{

@@ -11,6 +11,8 @@ import CodeOnlineServices from '../../services/codeServices/codeOnlineServices/c
 import BaseResponse, {BackType} from '../../models/baseResponse';
 import Codes from '../../models/codes';
 import CodeServices from '../../services/codeServices/codeServices';
+import {HtmlObj} from '../../types/codes';
+import Components from '../../models/components';
 const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('/code/codeOnline')
@@ -63,15 +65,83 @@ export class CodeOnline {
         }
     }
 
+    /**
+     * 通过componentId获取代码模板
+     * @param {Object} req req对象
+     * @param {Object} res res返回对象
+     * @returns {Promise<void>} 执行
+     */
     @routerDec.RequestMapping('/getTemplate', MyType.post)
     async getHtmlTemplate(
         req: express.Request,
         res: express.Response
     ): Promise<void> {
+        const componentId: number = req.body.componentId ? Number(req.body.componentId) : 1;
+
         const response = new BaseResponse<Codes[]>();
+
         try {
-            const componentId: number = req.body.componentId ? Number(req.body.componentId) : 1;
             response._datas = await CodeOnline.CodeServices.getCodes(componentId);
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = e;
+        }
+        res.json(response);
+    }
+
+    /**
+     * 保存组件
+     * @param {Object} req req对象
+     * @param {Object} res res返回对象
+     * @returns {Promise<void>} 执行
+     */
+    @routerDec.RequestMapping('/saveTemplate', MyType.post)
+    async saveHtmlTemplate(
+        req: express.Request,
+        res: express.Response
+    ): Promise<void> {
+        const comName: string = req.body.name;
+        const getComponentId: number = req.body.id;
+        const getHtml: HtmlObj[] = JSON.parse(req.body.sendHtml ? req.body.sendHtml : '[]');
+
+        const response = new BaseResponse<boolean>();
+
+        try {
+            const componentId = await CodeOnline.CodeServices.setComponent(new Components(getComponentId, comName), getComponentId);
+
+            if (getHtml.length > 0) {
+                const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId));
+                response._datas = await CodeOnline.CodeServices.setCodes(codes);
+            }
+
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = e;
+        }
+        res.json(response);
+    }
+
+    /**
+     * 保存代码
+     * @param {Object} req req对象
+     * @param {Object} res res返回对象
+     * @returns {Promise<void>} 执行
+     */
+    @routerDec.RequestMapping('/saveCodeTemplate', MyType.post)
+    async saveCodeTemplate(
+        req: express.Request,
+        res: express.Response
+    ): Promise<void> {
+        const getHtml: HtmlObj[] = JSON.parse(req.body.sendHtml ? req.body.sendHtml : '[]');
+
+        const response = new BaseResponse<boolean>();
+
+        try {
+            if (getHtml.length > 0) {
+                const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, item.componentId));
+                response._datas = await CodeOnline.CodeServices.setCodes(codes);
+            }
+
             response.changeType(BackType.success);
         } catch (e) {
             response._msg = e;

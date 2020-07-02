@@ -57,16 +57,31 @@ export default class RedisDec {
     /**
      * 删除redis缓存
      * @param {String} key 需要删除namespace
-     * @returns {MethodDecorator} 返回构造方法
+     * @param {String} MypropertyKey 需要删除的方法名
+     * @param {String} params 绑定参数
+     * @returns {Function} 返回构造方法
      */
-    static CacheEvict(key: string): MethodDecorator{
+    static CacheEvict(key: string, MypropertyKey?: string, params?: string): MethodDecorator{
         return (target: any, propertyKey: string, descriptor: PropertyDescriptor): void => {
             // 保存现有方法
             const setFunction = descriptor.value;
+
+            // 获取方法需要的传参
+            const getParams = RedisDec.getFunParams(setFunction);
+
             // 重写方法
-            descriptor.value = (): any => {
-                RedisDec.removeAllCache(key);
-                return setFunction();
+            descriptor.value = (...args): any => {
+                let reqParams = [];
+                if (params) {
+                    params.split('#').forEach((item) => {
+                        const index = getParams.indexOf(item);
+                        if (args[index]) {
+                            reqParams.push(item + '-' + args[index]);
+                        }
+                    });
+                }
+                RedisDec.removeFnCache(key, MypropertyKey, reqParams);
+                return setFunction(...args);
             };
         };
     }
@@ -98,21 +113,43 @@ export default class RedisDec {
     }
 
     /**
-     * 删除传入namespace所有key
-     * @param {String} key 需要删除key
+     * 通过方法判断移出
+     * @param {String} key 传入namespace空间
+     * @param {String} propertyKey 传入方法名
+     * @param {String} params 绑定参数
      * @returns {void}
      */
-    private static removeAllCache(key: string): void {
+    static removeFnCache(key: string, propertyKey?: string, params?: string[]): void {
         if (this.CacheNamespace[key]) {
-            Object.keys(this.CacheNamespace[key]).forEach((propertyKey) => {
-                Object.keys(this.CacheNamespace[key][propertyKey]).forEach((params) => {
-                    if (this.CacheNamespace[key][propertyKey][params].time > Math.round((new Date()).getTime() / 1000)) {
-                        MyRedis.remove(`${key}:${propertyKey}:${params}`);
+            Object.keys(this.CacheNamespace[key]).filter((item: string) => {
+                if (!propertyKey) {
+                    return true;
+                }
+                if (propertyKey === item) {
+                    return true;
+                }
+            }).forEach((propertyKeyO: string) => {
+                Object.keys(this.CacheNamespace[key][propertyKeyO]).filter((item: string) => {
+                    if (params.length === 0){
+                        return true;
+                    } else {
+                        let check = true;
+                        params.forEach((eachItem: string) => {
+                            if (item.indexOf(eachItem) === -1) {check = false;}
+                        });
+                        return check;
+                    }
+                }).forEach((paramsO: string) => {
+                    if (this.CacheNamespace[key][propertyKeyO][paramsO].time > Math.round((new Date()).getTime() / 1000)) {
+                        MyRedis.remove(`${key}:${propertyKeyO}:${paramsO}`);
                     }
                 });
             });
-            delete this.CacheNamespace[key];
+            if (!propertyKey && params) {
+                delete this.CacheNamespace[key];
+            }
         }
+
     }
 
     /**

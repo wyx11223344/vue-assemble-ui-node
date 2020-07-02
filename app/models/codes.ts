@@ -1,16 +1,14 @@
-import CodeTypes from './codeTypes';
-
 export default class Codes {
     id: number;
     name: string;
-    type: CodeTypes;
-    componetId: number;
+    html: string;
+    componentId: number;
 
-    constructor(id: number, name: string, type: CodeTypes, componetId: number) {
+    constructor(id: number, name: string, html: string, componentId: number) {
         this.id = id;
         this.name = name;
-        this.type = type;
-        this.componetId = componetId;
+        this.html = html;
+        this.componentId = componentId;
     }
 
     get _id(): number {
@@ -29,19 +27,19 @@ export default class Codes {
         this.name = value;
     }
 
-    get _type(): CodeTypes{
-        return this.type;
+    get _html(): string{
+        return this.html;
     }
 
-    set _type(value: CodeTypes) {
-        this.type = value;
+    set _html(value: string) {
+        this.html = value;
     }
 
-    get _componetId(): number{
-        return this.componetId;
+    get _componentId(): number{
+        return this.componentId;
     }
 
-    set _componetId(value: number) {
-        this.componetId = value;
+    set _componentId(value: number) {
+        this.componentId = value;
     }
 }
