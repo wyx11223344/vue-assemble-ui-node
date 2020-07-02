@@ -139,7 +139,7 @@ export class Server {
                 }
             },
             basedir: __dirname, // app absolute path
-            files: ['./routes/**/*.ts'] // Path to the API handle folder
+            files: ['./routes/**/*.ts', './routes/**/*.js'] // Path to the API handle folder
         };
         expressSwagger(options);
     }
