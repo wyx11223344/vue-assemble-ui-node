@@ -65,11 +65,10 @@ export default class PublishPackageServices implements PublishPackageServicesImp
      * @returns {Promise<boolean>}
      */
     private static downLoadGitTemplate(git: string, path: string): Promise<boolean> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             downloadGit(git, path, { clone: true }, (err) => {
                 if (err) {
-                    console.log(err);
-                    resolve(false);
+                    reject(err);
                 } else {
                     resolve(true);
                 }
@@ -206,44 +205,45 @@ export default {
 
         const dealObject: NpmRedisObj = JSON.parse(await MyRedis.lpop('npmPublishControl'));
 
-        if (this.runningObj.find((item: NpmRedisObj) => item.path === dealObject.path)) {
-            await this.npmRunFn();
-            await MyRedis.lpush('npmPublishControl', JSON.stringify(dealObject));
-            return ;
-        }
+        try {
 
-        this.runningObj.push(dealObject);
-
-        // 创建基础项目
-        if (await this.checkPathExist(dealObject.path)) {
-            if (!await this.downLoadGitTemplate('direct:https://gitee.com/missshen/vue-assemble-ui-package', dealObject.path)) {
+            if (this.runningObj.find((item: NpmRedisObj) => item.path === dealObject.path)) {
+                await this.npmRunFn();
+                await MyRedis.lpush('npmPublishControl', JSON.stringify(dealObject));
                 return ;
             }
-        } else {
-            return ;
-        }
 
-        // 执行构建项目,更新入口index
-        await this.createPackageByObject(dealObject.path, dealObject.componentsObj);
+            this.runningObj.push(dealObject);
 
-        // 更新package.json文件(未完成)
-        const obj = {
-            name: `@wyx962717593/${dealObject.name}`,
-            version: dealObject.version
-        };
-        await this.packageJsonUpdate(dealObject.path, obj);
+            // 创建基础项目
+            await this.checkPathExist(dealObject.path);
+            await this.downLoadGitTemplate('direct:https://gitee.com/missshen/vue-assemble-ui-package', dealObject.path);
 
-        // 开始发布
-        await new Promise((resolve) => {
-            exec('npm publish --access public', { cwd: dealObject.path }, (error, stdout, stderr) => {
-                exec(`rm -rf ${dealObject.path}`, () => {
-                    this.runningObj.splice(this.runningObj.findIndex((item) => item.path === dealObject.path), 1);
-                    console.log(error, stdout, stderr);
-                    this.npmRunFn();
-                    resolve();
+            // 执行构建项目,更新入口index
+            await this.createPackageByObject(dealObject.path, dealObject.componentsObj);
+
+            // 更新package.json文件(未完成)
+            const obj = {
+                name: `@wyx962717593/${dealObject.name}`,
+                version: dealObject.version
+            };
+            await this.packageJsonUpdate(dealObject.path, obj);
+
+            // 开始发布
+            await new Promise((resolve) => {
+                exec('npm publish --access public', { cwd: dealObject.path }, (error, stdout, stderr) => {
+                    exec(`rm -rf ${dealObject.path}`, () => {
+                        this.runningObj.splice(this.runningObj.findIndex((item) => item.path === dealObject.path), 1);
+                        console.log(error, stdout, stderr);
+                        this.npmRunFn();
+                        resolve();
+                    });
                 });
             });
-        });
+        } catch (e) {
+            console.log(e);
+            this.runningObj.splice(this.runningObj.findIndex((item) => item.path === dealObject.path), 1);
+        }
     }
 
 }
