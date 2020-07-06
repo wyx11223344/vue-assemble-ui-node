@@ -24,9 +24,10 @@ export class CodeOnline {
      * 返回标准html页面方法
      * @route POST /code/codeOnline/setHtml
      * @group 代码在线编辑
-     * @param {string} findId 返回
-     * @param {String} sendHtml 测试
-     * @returns {VoidFunction} async异步
+     * @param {string} findId.formData.required 返回
+     * @param {string} sendHtml.formData.required 测试
+     * @returns {VoidFunction} 200 - 返回true
+     * @returns {VoidFunction} 500 - 返回错误
      */
     @routerDec.RequestMapping('/setHtml', MyType.post)
     async setHtml(
@@ -45,42 +46,44 @@ export class CodeOnline {
 
     /**
      * 返回标准html页面方法
-     * @param {express.Request} req 请求
-     * @param {express.Response} res 返回
-     * @returns {Promise<void>} async异步
+     * @route GET /code/codeOnline/index.html
+     * @group 代码在线编辑
+     * @param {string} findId.query.required - 查询id
+     * @returns {Promise} 200 - 返回渲染页面
+     * @returns {Error} 500 - 返回错误页面
      */
     @routerDec.RequestMapping('/index.html', MyType.get)
     async backHtml(
-        req: express.Request,
-        res: express.Response
+        @routerDec.RequestParams('String', 'findId') findId,
+        @routerDec.Response() res: express.Response,
+        @routerDec.NextFunction() next
     ): Promise<void> {
-        res.writeHead(200, {
-            'Content-Type': 'text/html',
-            'Expires': new Date().toUTCString()
-        });
         try {
-            const a: string = await MyRedis.get(req.query.findId as string);
+            const a: string = await MyRedis.get(findId);
+            const backHtml = await CodeOnline.CodeOnlineServices.dealVueOnlineCode(a);
+
             res.write(TemplateHTML.startHTML);
-            res.write(await CodeOnline.CodeOnlineServices.dealVueOnlineCode(a));
+            res.write(backHtml);
             res.end(TemplateHTML.endHTML);
         } catch (e) {
-            res.end(e.toString());
+            next(e);
         }
     }
 
     /**
      * 通过componentId获取代码模板
-     * @param {Object} req req对象
-     * @param {Object} res res返回对象
-     * @returns {Promise<void>} 执行
+     * @route POST /code/codeOnline/getTemplate
+     * @group 代码在线编辑
+     * @param {number} componentId.formData 传入组件id
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
      */
     @routerDec.RequestMapping('/getTemplate', MyType.post)
     async getHtmlTemplate(
-        req: express.Request,
-        res: express.Response
+        @routerDec.RequestParams('Number', 'componentId') componentId: number,
+        @routerDec.Response() res: express.Response
     ): Promise<void> {
-        const componentId: number = req.body.componentId ? Number(req.body.componentId) : 1;
-
+        componentId = componentId ? componentId : 1;
         const response = new BaseResponse<Codes[]>();
 
         try {
@@ -89,28 +92,32 @@ export class CodeOnline {
         } catch (e) {
             response._msg = e;
         }
+
         res.json(response);
     }
 
     /**
      * 保存组件
-     * @param {Object} req req对象
-     * @param {Object} res res返回对象
-     * @returns {Promise<void>} 执行
+     * @route POST /code/codeOnline/saveHtmlTemplate
+     * @group 代码在线编辑
+     * @param {string} comName.formData 组件名称
+     * @param {number} getComponentId.formData 组件id
+     * @param {string} sendHtml.formData 组件code数组
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
      */
     @routerDec.RequestMapping('/saveTemplate', MyType.post)
     async saveHtmlTemplate(
-        req: express.Request,
-        res: express.Response
+        @routerDec.RequestParams('String', 'name') comName: string,
+        @routerDec.RequestParams('Number', 'id') getComponentId: number,
+        @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
+        @routerDec.Response() res: express.Response
     ): Promise<void> {
-        const comName: string = req.body.name;
-        const getComponentId: number = req.body.id;
-        const getHtml: HtmlObj[] = JSON.parse(req.body.sendHtml ? req.body.sendHtml : '[]');
-
+        const getHtml: HtmlObj[] = JSON.parse(sendHtml ? sendHtml : '[]');
         const response = new BaseResponse<boolean>();
 
         try {
-            const componentId = await CodeOnline.CodeServices.setComponent(new Components(getComponentId, comName), getComponentId);
+            const componentId = await CodeOnline.CodeServices.setComponent(new Components(getComponentId, comName, null, null, null), getComponentId);
 
             if (getHtml.length > 0) {
                 const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId));
@@ -121,22 +128,24 @@ export class CodeOnline {
         } catch (e) {
             response._msg = e;
         }
+
         res.json(response);
     }
 
     /**
      * 保存代码
-     * @param {Object} req req对象
-     * @param {Object} res res返回对象
-     * @returns {Promise<void>} 执行
+     * @route POST /code/codeOnline/saveCodeTemplate
+     * @group 代码在线编辑
+     * @param {string} sendHtml.formData.required 组件code数组
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
      */
     @routerDec.RequestMapping('/saveCodeTemplate', MyType.post)
     async saveCodeTemplate(
-        req: express.Request,
-        res: express.Response
+        @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
+        @routerDec.Response() res: express.Response
     ): Promise<void> {
-        const getHtml: HtmlObj[] = JSON.parse(req.body.sendHtml ? req.body.sendHtml : '[]');
-
+        const getHtml: HtmlObj[] = JSON.parse(sendHtml ? sendHtml : '[]');
         const response = new BaseResponse<boolean>();
 
         try {
@@ -149,6 +158,7 @@ export class CodeOnline {
         } catch (e) {
             response._msg = e;
         }
+
         res.json(response);
     }
 

@@ -35,7 +35,7 @@ export default class RedisDec {
                     params.split('#').forEach((item) => {
                         const index = getParams.indexOf(item);
                         if (args[index]) {
-                            reqParams += item + '-' + args[index] + '&';
+                            reqParams += item + '-' + String(args[index]) + '&';
                         }
                     });
                 } else {
@@ -46,7 +46,7 @@ export default class RedisDec {
                     RedisDec.changeCacheTime(key, propertyKey, outTime, reqParams);
                     return JSON.parse(getValue);
                 }
-                const dueBack: JSON = await setFunction(...args);
+                const dueBack: JSON = await setFunction.bind(target)(...args);
                 MyRedis.set(`${key}:${propertyKey}:${reqParams}`, JSON.stringify(dueBack));
                 RedisDec.changeCacheTime(key, propertyKey, outTime, reqParams);
                 return dueBack;

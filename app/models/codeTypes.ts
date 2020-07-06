@@ -1,25 +1,24 @@
 export default class CodeTypes {
-    private id: number;
-    private typename: string;
+    private _id: number;
+    private _typename: string;
 
     constructor(id: number, typename: string) {
-        this.id = id;
-        this.typename = typename;
+        this._id = id;
+        this._typename = typename;
+    }
+    get id(): number {
+        return this._id;
     }
 
-    get _id(): number {
-        return this.id;
+    set id(value: number) {
+        this._id = value;
     }
 
-    set _id(value: number) {
-        this.id = value;
+    get typename(): string {
+        return this._typename;
     }
 
-    get _typename(): string {
-        return this.typename;
-    }
-
-    set _typename(value: string) {
-        this.typename = value;
+    set typename(value: string) {
+        this._typename = value;
     }
 }

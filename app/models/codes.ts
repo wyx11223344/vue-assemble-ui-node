@@ -1,45 +1,55 @@
 export default class Codes {
-    id: number;
-    name: string;
-    html: string;
-    componentId: number;
+    private _id: number;
+    private _name: string;
+    private _html: string;
+    private _type: number;
+    private _componentId: number;
 
-    constructor(id: number, name: string, html: string, componentId: number) {
-        this.id = id;
-        this.name = name;
-        this.html = html;
-        this.componentId = componentId;
+    constructor(id: number, name: string, html: string, componentId: number, type?: number) {
+        this._id = id;
+        this._name = name;
+        this._html = html;
+        this._type = type;
+        this._componentId = componentId;
     }
 
-    get _id(): number {
-        return this.id;
+    get id(): number {
+        return this._id;
     }
 
-    set _id(value: number) {
-        this.id = value;
+    set id(value: number) {
+        this._id = value;
     }
 
-    get _name(): string{
-        return this.name;
+    get name(): string {
+        return this._name;
     }
 
-    set _name(value: string) {
-        this.name = value;
+    set name(value: string) {
+        this._name = value;
     }
 
-    get _html(): string{
-        return this.html;
+    get html(): string {
+        return this._html;
     }
 
-    set _html(value: string) {
-        this.html = value;
+    set html(value: string) {
+        this._html = value;
     }
 
-    get _componentId(): number{
-        return this.componentId;
+    get type(): number {
+        return this._type;
     }
 
-    set _componentId(value: number) {
-        this.componentId = value;
+    set type(value: number) {
+        this._type = value;
+    }
+
+    get componentId(): number {
+        return this._componentId;
+    }
+
+    set componentId(value: number) {
+        this._componentId = value;
     }
 }

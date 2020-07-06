@@ -57,22 +57,30 @@ export class RouterDec {
 
             descriptor.value = (...arg): void => {
 
-                if (!this.ParamsObj[propertyKey]) {
+                if (!this.ParamsObj[propertyKey] && !this.expressParams[propertyKey]) {
                     setFunction(...arg);
                     return;
                 }
 
                 const paramsList = [];
 
-                Object.keys(this.ParamsObj[propertyKey]).forEach((item) => {
-                    paramsList[this.ParamsObj[propertyKey][item].index] = this.ParamsObj[propertyKey][item].type(arg[0].body[item]);
-                });
+                if (this.ParamsObj[propertyKey]) {
+                    Object.keys(this.ParamsObj[propertyKey]).forEach((item) => {
+                        if (type === MyType.post) {
+                            paramsList[this.ParamsObj[propertyKey][item].index] = this.ParamsObj[propertyKey][item].type(arg[0].body[item]);
+                        } else if (type === MyType.get) {
+                            paramsList[this.ParamsObj[propertyKey][item].index] = this.ParamsObj[propertyKey][item].type(arg[0].query[item]);
+                        }
+                    });
+                }
 
-                this.expressParams[propertyKey].forEach((item, index) => {
-                    if (item) {
-                        paramsList[item] = arg[index];
-                    }
-                });
+                if (this.expressParams[propertyKey]) {
+                    this.expressParams[propertyKey].forEach((item, index) => {
+                        if (typeof item === 'number') {
+                            paramsList[item] = arg[index];
+                        }
+                    });
+                }
 
                 setFunction(...paramsList);
             };

@@ -12,11 +12,14 @@ class UsersMapper {
      * @returns {void}
      */
     static getAllUser(): Promise<any> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             MySql.query('select * from users')
                 .then((results) => {
                     console.log(results);
                     resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
                 });
         });
     }

@@ -1,55 +1,55 @@
 export default class Components{
-    private id: number;
-    private name: string;
-    private type: number;
-    private usersId: number;
-    private status: number
+    private _id: number;
+    private _name: string;
+    private _type: number;
+    private _usersId: number;
+    private _status: number
 
-    constructor(id?: number, name?: string, type?: number, usersId?: number, status?: number) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.usersId = usersId;
-        this.status = status;
+    constructor(id: number, name: string, type: number, usersId: number, status: number) {
+        this._id = id;
+        this._name = name;
+        this._type = type;
+        this._usersId = usersId;
+        this._status = status;
     }
 
-    get _id(): number {
-        return this.id;
+    get id(): number {
+        return this._id;
     }
 
-    set _id(value: number) {
-        this.id = value;
+    set id(value: number) {
+        this._id = value;
     }
 
-    get _name(): string {
-        return this.name;
+    get name(): string {
+        return this._name;
     }
 
-    set _name(value: string) {
-        this.name = value;
+    set name(value: string) {
+        this._name = value;
     }
 
-    get _type(): number {
-        return this.type;
+    get type(): number {
+        return this._type;
     }
 
-    set _type(value: number) {
-        this.type = value;
+    set type(value: number) {
+        this._type = value;
     }
 
-    get _usersId(): number {
-        return this.usersId;
+    get usersId(): number {
+        return this._usersId;
     }
 
-    set _usersId(value: number) {
-        this.usersId = value;
+    set usersId(value: number) {
+        this._usersId = value;
     }
 
-    get _status(): number {
-        return this.status;
+    get status(): number {
+        return this._status;
     }
 
-    set _status(value: number) {
-        this.status = value;
+    set status(value: number) {
+        this._status = value;
     }
 }

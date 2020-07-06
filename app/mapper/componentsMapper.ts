@@ -9,12 +9,15 @@ export default class ComponentsMapper {
      * @returns {Promise<any>} 返回结果
      */
     static setNewComponents(components: Components): Promise<any> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             MySql.queryArgs('INSERT INTO components (name) VALUES (?)', [
-                components._name
+                components.name
             ])
                 .then((results: any) => {
                     resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
                 });
         });
     }
@@ -27,25 +30,29 @@ export default class ComponentsMapper {
     static updateComponents(components: Components): Promise<any> {
         let sets = '';
         Object.keys(components).filter((item: string) => item !== 'id').forEach((item) => {
-            if (components['_' + item]) {
-                sets += sets ? `, ${item} = '${components['_' + item]}'` : `set ${item} = '${components['_' + item]}'`;
+            const key = item.replace('_', '');
+            if (components[key]) {
+                sets += sets ? `, ${key} = '${components[item]}'` : `set ${key} = '${components[item]}'`;
             }
         });
 
         if (!sets) {
             return new Promise((resolve) => {
                 resolve({
-                    insertId: components._id
+                    insertId: components.id
                 });
             });
         }
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             MySql.queryArgs(`UPDATE components ${sets} WHERE id = ?`, [
-                components._id
+                components.id
             ])
                 .then((results: any) => {
                     resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
                 });
         });
     }

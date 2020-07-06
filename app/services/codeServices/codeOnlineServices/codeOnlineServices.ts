@@ -21,9 +21,16 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
      */
     async dealVueOnlineCode(a: string): Promise<string> {
         let backString = '';
+        let aList: HtmlObj[] | undefined;
 
         if (a) {
-            const aList: HtmlObj[] = JSON.parse(a);
+            try {
+                aList = JSON.parse(a);
+            } catch (e) {
+                throw Error(e);
+                // return '请传入正常的json字符串';
+            }
+
             let baseObje = {
                 el: ''
             };
@@ -46,7 +53,7 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
                     }
 
                 } catch (e) {
-                    return '代码解析失败，请检查';
+                    return 'scrpit代码解析失败，请检查';
                 }
                 try {
                     const style: string = CodeOnlineServices.getSource(item.html, 'style');
@@ -59,6 +66,8 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
 
             const backJs: string = CodeOnlineServices.createJs(baseObje, listObj);
             backString = `${template}\n${backJs}\n<style>\n${cssStyle}</style>\n`;
+        } else {
+            backString = '没有找到缓存\n';
         }
 
         return backString;

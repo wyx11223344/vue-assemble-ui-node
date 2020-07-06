@@ -117,6 +117,48 @@ class MyRedis {
     }
 
     /**
+     * 末位数组添加
+     * @param {String} key 推入key值
+     * @param {String} argObj 传入值
+     * @returns {void}
+     */
+    static rpush(key: string, argObj: string): void {
+        this.redisClient.rpush(key, argObj, this.errFun);
+    }
+
+    /**
+     * 首位数组添加
+     * @param {String} key 推入key值
+     * @param {String} argObj 传入值
+     * @returns {void}
+     */
+    static lpush(key: string, argObj: string): void {
+        this.redisClient.lpush(key, argObj, this.errFun);
+    }
+
+    /**
+     * 获取数组长度
+     * @param {String} key 获取key
+     * @returns {Promise<string[]>} 返回查询结果
+     */
+    static llen(key: string): Promise<number> {
+        return this.getFun((fn: Redis.Callback<number>) => {
+            this.redisClient.llen(key, fn);
+        }) as Promise<number>;
+    }
+
+    /**
+     * 获取数组并移出第一位
+     * @param {String} key 获取key
+     * @returns {Promise<string[]>} 返回查询结果
+     */
+    static lpop(key: string): Promise<string> {
+        return this.getFun((fn: Redis.Callback<string>) => {
+            this.redisClient.lpop(key, fn);
+        }) as Promise<string>;
+    }
+
+    /**
      * 设定无返回操作错误处理
      * @param {null|Error} err 错误
      * @returns {void}
@@ -132,9 +174,9 @@ class MyRedis {
      * @param {Function} fn 传入执行方法
      * @returns {Promise<string|string[]>} 返回Promise对象
      */
-    private static getFun(fn: Function): Promise<string | string[]> {
-        return new Promise<string | string[]>((resolve, reject): void => {
-            fn((err: null | Error, getRslt: string | string[]): void => {
+    private static getFun(fn: Function): Promise<string | string[] | number> {
+        return new Promise<string | string[] | number>((resolve, reject): void => {
+            fn((err: null | Error, getRslt: string | string[] | number): void => {
                 if (err) {
                     reject();
                     throw err;

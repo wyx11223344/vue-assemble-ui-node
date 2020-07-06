@@ -9,10 +9,13 @@ export default class CodesMapper {
      * @returns {Promise<any>} 返回结果
      */
     static getCodesByComId(componentId: number): Promise<Codes[]> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             MySql.query(`select * from codes where componentId = ${componentId}`)
                 .then((results: Codes[]) => {
                     resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
                 });
         });
     }
@@ -23,14 +26,17 @@ export default class CodesMapper {
      * @returns {Promise<any>} 返回结果
      */
     static setCodesByComId(Codes: Codes): Promise<any> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             MySql.queryArgs('INSERT INTO codes (name, html, componentId) VALUES (?, ?, ?)', [
-                Codes._name,
-                Codes._html,
-                Codes._componentId
+                Codes.name,
+                Codes.html,
+                Codes.componentId
             ])
                 .then((results: any) => {
                     resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
                 });
         });
     }
@@ -41,15 +47,18 @@ export default class CodesMapper {
      * @returns {Promise<any>} 返回结果
      */
     static updateCodesById(Codes: Codes): Promise<any> {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             MySql.queryArgs('UPDATE codes set name = ?, html = ?, componentId = ? where id = ?', [
-                Codes._name,
-                Codes._html,
-                Codes._componentId,
-                Codes._id
+                Codes.name,
+                Codes.html,
+                Codes.componentId,
+                Codes.id
             ])
                 .then((results: any) => {
                     resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
                 });
         });
     }
