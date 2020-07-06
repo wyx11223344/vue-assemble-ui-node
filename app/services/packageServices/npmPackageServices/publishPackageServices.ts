@@ -68,6 +68,7 @@ export default class PublishPackageServices implements PublishPackageServicesImp
         return new Promise((resolve) => {
             downloadGit(git, path, { clone: true }, (err) => {
                 if (err) {
+                    console.log(err);
                     resolve(false);
                 } else {
                     resolve(true);
@@ -215,7 +216,9 @@ export default {
 
         // 创建基础项目
         if (await this.checkPathExist(dealObject.path)) {
-            await this.downLoadGitTemplate('direct:https://gitee.com/missshen/vue-assemble-ui-package', dealObject.path);
+            if (!await this.downLoadGitTemplate('direct:https://gitee.com/missshen/vue-assemble-ui-package', dealObject.path)) {
+                return ;
+            }
         } else {
             return ;
         }
