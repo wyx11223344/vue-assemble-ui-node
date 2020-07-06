@@ -33,7 +33,7 @@ export class NpmPackage {
         @routerDec.RequestParams('String', 'version') version: string,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
-        if ((await NpmPackage.PackageServices.getNpmByName(name)).length > 0) {
+        if (!id && (await NpmPackage.PackageServices.getNpmByName(name)).length > 0) {
             res.send(false);
             return ;
         }
