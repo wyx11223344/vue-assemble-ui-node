@@ -4,9 +4,15 @@ export interface PackageServicesImp {
 
     /**
      * 通过id获取npm信息
-     * @param {String} npmId npmId号(,拼接查询多个)
+     * @param {String} npmId npmId号
      */
-    getNpmById(npmId: string): Promise<NpmPublish[]>;
+    getNpmById(npmId: number): Promise<NpmPublish>;
+
+    /**
+     * 查询id获取信息通过ids（推荐使用改方法）
+     * @param npmIds 以,拼接
+     */
+    getNpmByIds(npmIds: string): Promise<NpmPublish[]>;
 
     /**
      * 通过name获取npm信息

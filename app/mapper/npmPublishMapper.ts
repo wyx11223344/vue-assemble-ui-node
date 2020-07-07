@@ -20,18 +20,27 @@ export default class NpmPublishMapper {
     }
 
     /**
+     * 通过指定id删除npm包
+     */
+    static delectNpmById(NpmId: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            MySql.query('DELETE FROM npmPublish WHERE id =  ' + NpmId)
+                .then((results) => {
+                    resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    /**
      * 获取npm包通过id
      * @returns {void}
      */
-    static getNpmById(npmId: string): Promise<any> | [] {
-        const npmIds = npmId.split(',');
-        if (npmIds.length <= 0) {return [];}
-        let whereSelect = '';
-        npmIds.forEach((item: string) => {
-            whereSelect = whereSelect ? whereSelect + `or id = ${item}` : `id = ${item}`;
-        });
+    static getNpmById(npmId: number): Promise<any> | [] {
         return new Promise((resolve, reject) => {
-            MySql.query('select * from npmPublish where ' + whereSelect)
+            MySql.query('select * from npmPublish where id' + npmId)
                 .then((results) => {
                     resolve(results);
                 })

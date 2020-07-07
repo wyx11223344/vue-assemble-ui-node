@@ -40,7 +40,7 @@ export class NpmPackage {
 
         const npmPublish: NpmPublish = new NpmPublish(id, name, componentsId, version);
 
-        if (!await NpmPackage.PackageServices.setNpm(npmPublish)) {
+        if (!await NpmPackage.PackageServices.setNpm(npmPublish, npmPublish.id)) {
             res.send(false);
             return ;
         }
@@ -70,7 +70,7 @@ export class NpmPackage {
         const response = new BaseResponse<NpmPublish[]>();
 
         try {
-            response._datas = await NpmPackage.PackageServices.getNpmById(NpmId);
+            response._datas = await NpmPackage.PackageServices.getNpmByIds(NpmId);
             response.changeType(BackType.success);
         } catch (e) {
             response._msg = e;
