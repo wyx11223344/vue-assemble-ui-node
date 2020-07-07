@@ -102,6 +102,28 @@ export class NpmPackage {
 
         res.send(response);
     }
+
+    /**
+     * 获取全部npm包信息
+     * @group npm包管理
+     * @route POST /package/npmPackage/getAllNpm
+     * @returns {Promise} 200 - 返回npm包信息数组
+     */
+    @routerDec.RequestMapping('/getAllNpm', MyType.post)
+    async getAllNpm(
+        @routerDec.Response() res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<NpmPublish[]>();
+
+        try {
+            response._datas = await NpmPackage.PackageServices.getAllNpm();
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = e;
+        }
+
+        res.send(response);
+    }
 }
 
 export default routerDec;

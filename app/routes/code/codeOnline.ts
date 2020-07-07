@@ -8,6 +8,7 @@ import TemplateHTML from '../../template/defaultIframe';
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import MyRedis from '../../cache';
 import CodeOnlineServices from '../../services/codeServices/codeOnlineServices/codeOnlineServices';
+import ComponentsServices from '../../services/componentsServices/componentsServices';
 import BaseResponse, {BackType} from '../../models/baseResponse';
 import Codes from '../../models/codes';
 import CodeServices from '../../services/codeServices/codeServices';
@@ -19,6 +20,7 @@ const routerDec: RouterDec = new RouterDec();
 export class CodeOnline {
     private static CodeOnlineServices: CodeOnlineServices = new CodeOnlineServices()
     private static CodeServices: CodeServices = new CodeServices()
+    private static ComponentsServices: ComponentsServices = new ComponentsServices()
 
     /**
      * 返回标准html页面方法
@@ -117,7 +119,7 @@ export class CodeOnline {
         const response = new BaseResponse<boolean>();
 
         try {
-            const componentId = await CodeOnline.CodeServices.setComponent(new Components(getComponentId, comName, null, null, null), getComponentId);
+            const componentId = await CodeOnline.ComponentsServices.setComponent(new Components(getComponentId, comName, null, null, null), getComponentId);
 
             if (getHtml.length > 0) {
                 const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId));
@@ -153,6 +155,30 @@ export class CodeOnline {
                 const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, item.componentId));
                 response._datas = await CodeOnline.CodeServices.setCodes(codes);
             }
+
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = e;
+        }
+
+        res.json(response);
+    }
+
+    /**
+     * 获取全部npm包
+     * @route POST /code/codeOnline/getAllComponents
+     * @group 代码在线编辑
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
+     */
+    @routerDec.RequestMapping('/getAllComponents', MyType.post)
+    async getAllComponents(
+        @routerDec.Response() res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<Components[]>();
+
+        try {
+            response._datas = await CodeOnline.ComponentsServices.getAllComponents();
 
             response.changeType(BackType.success);
         } catch (e) {

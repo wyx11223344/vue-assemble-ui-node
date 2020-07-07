@@ -19,4 +19,9 @@ export interface PackageServicesImp {
      * @param {NpmPublish} npmPublish 新增对象
      */
     setNpm(npmPublish: NpmPublish): Promise<boolean>;
+
+    /**
+     * 获取全部npm包
+     */
+    getAllNpm(): Promise<NpmPublish[]>;
 }

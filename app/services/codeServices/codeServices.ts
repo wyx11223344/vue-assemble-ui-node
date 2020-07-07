@@ -2,8 +2,6 @@ import {CodeSercicesImp} from './codeSercicesImp';
 import Codes from '../../models/codes';
 import CodesMapper from '../../mapper/codesMapper';
 import RedisDec from '../../decorators/redisDec';
-import Components from '../../models/components';
-import ComponentsMapper from '../../mapper/componentsMapper';
 
 export default class CodeServices implements CodeSercicesImp{
 
@@ -22,7 +20,6 @@ export default class CodeServices implements CodeSercicesImp{
      * @param {number[]} componentIds 传入ids数组
      * @returns {Promise<{[p: string]: Codes[]}>}
      */
-    @RedisDec.Cacheable('Codes', '#componentIds')
     async getCodesByIds(componentIds: number[]): Promise<{[a: string]: Codes[]}> {
         return await new Promise((resolve) => {
             let checkCodePromise = 0;
@@ -46,7 +43,6 @@ export default class CodeServices implements CodeSercicesImp{
      * @param {Codes[]} Codes 传递Codes对象数组
      * @returns {Promise<boolean>} 返回结果
      */
-    @RedisDec.CacheEvict('Codes', 'getCodes')
     setCodes(Codes: Codes[]): Promise<boolean> {
         return new Promise((resolve) => {
             let checkNum = 0;
@@ -72,20 +68,5 @@ export default class CodeServices implements CodeSercicesImp{
                 }
             });
         });
-    }
-
-    /**
-     * 保存新组件返回id
-     * @param {Components} components 组件对象
-     * @param {Number} componentId 组件id值，用作缓存清除
-     * @returns {Promise<number>} 返回id
-     */
-    @RedisDec.CacheEvict('Codes', 'getCodes', '#componentId')
-    setComponent(components: Components, componentId?: number): Promise<number> {
-        if (componentId) {
-            return ComponentsMapper.updateComponents(components).then((r) => r.insertId);
-        } else {
-            return ComponentsMapper.setNewComponents(components).then((r) => r.insertId);
-        }
     }
 }

@@ -46,6 +46,7 @@ export default class RedisDec {
                     RedisDec.changeCacheTime(key, propertyKey, outTime, reqParams);
                     return JSON.parse(getValue);
                 }
+
                 const dueBack: JSON = await setFunction.bind(target)(...args);
                 MyRedis.set(`${key}:${propertyKey}:${reqParams}`, JSON.stringify(dueBack));
                 RedisDec.changeCacheTime(key, propertyKey, outTime, reqParams);
@@ -158,9 +159,9 @@ export default class RedisDec {
      * @returns {Array} 返回获取参数数组
      */
     private static getFunParams(fn: Function): string[] {
-        const regex1 = /\((.+?)\)/g; // () 小括号
+        const regex1 = /\((.*?)\)/; // () 小括号
         const getList = fn.toString().match(regex1);
-        const dealString = getList[0].substring(1, getList[0].length - 1).replace(' ', '');
+        const dealString = getList[1].replace(' ', '');
         return dealString.split(',');
     }
 }

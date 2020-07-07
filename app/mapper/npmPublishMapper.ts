@@ -4,6 +4,22 @@ import NpmPublish from '../models/npmPublish';
 export default class NpmPublishMapper {
 
     /**
+     * 获取全部npm包信息
+     * @returns {Promise<NpmPublish[]>}
+     */
+    static getAllNpm(): Promise<NpmPublish[]> {
+        return new Promise((resolve, reject) => {
+            MySql.query('select * from npmPublish')
+                .then((results: NpmPublish[]) => {
+                    resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    /**
      * 获取npm包通过id
      * @returns {void}
      */

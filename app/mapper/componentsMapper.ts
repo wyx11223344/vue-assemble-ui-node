@@ -4,6 +4,22 @@ import Components from '../models/components';
 export default class ComponentsMapper {
 
     /**
+     * 获取全部npm包信息
+     * @returns {Promise<NpmPublish[]>}
+     */
+    static getAllComponents(): Promise<Components[]> {
+        return new Promise((resolve, reject) => {
+            MySql.query('select * from components')
+                .then((results: Components[]) => {
+                    resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    /**
      * 保存新组件
      * @param {Components} components 新增对象
      * @returns {Promise<any>} 返回结果

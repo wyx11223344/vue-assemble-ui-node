@@ -1,6 +1,7 @@
 import {PackageServicesImp} from './packageServicesImp';
 import NpmPublish from '../../models/npmPublish';
 import NpmPublishMapper from '../../mapper/npmPublishMapper';
+import RedisDec from '../../decorators/redisDec';
 
 export default class PackageServices implements PackageServicesImp{
 
@@ -27,6 +28,7 @@ export default class PackageServices implements PackageServicesImp{
      * @param {NpmPublish} npmPublish 新增包对象
      * @returns {Promise<boolean>}
      */
+    @RedisDec.CacheEvict('NpmPublish', 'getAllNpm')
     async setNpm(npmPublish: NpmPublish): Promise<boolean> {
         return new Promise(async (resolve) => {
             if (npmPublish.id) {
@@ -44,5 +46,14 @@ export default class PackageServices implements PackageServicesImp{
                 resolve(true);
             }
         });
+    }
+
+    /**
+     * 获取全部npm包信息
+     * @returns {Promise<NpmPublish[]>}
+     */
+    @RedisDec.Cacheable('NpmPublish')
+    getAllNpm(): Promise<NpmPublish[]> {
+        return NpmPublishMapper.getAllNpm();
     }
 }
