@@ -29,4 +29,34 @@ export default class ComponentsServices implements ComponentsServicesImp {
     getAllComponents(): Promise<Components[]> {
         return ComponentsMapper.getAllComponents();
     }
+
+    /**
+     * 通过id删除组件信息
+     * @param {Number} Id 组件id
+     * @returns {Promise<boolean>}
+     */
+    @RedisDec.CacheEvict('Components', 'getAllComponents')
+    private static removeComponentsById(Id: number): Promise<boolean> {
+        return ComponentsMapper.removeComponentById(Id);
+    }
+
+    /**
+     * 通过ids删除多个组件
+     * @param {String} Ids ids字符串
+     * @returns {Promise<boolean>}
+     */
+    removeComponentsByIds(Ids: string): Promise<boolean> {
+        let checkNum = 0;
+        let checkStatus = true;
+        return new Promise((resolve) => {
+            Ids.split(',').forEach((item: string) => {
+                ComponentsServices.removeComponentsById(Number(item)).then((results: boolean) => {
+                    if (!results) {checkStatus = false;}
+                    if (checkNum >= Ids.split(',').length) {
+                        resolve(checkStatus);
+                    }
+                });
+            });
+        });
+    }
 }

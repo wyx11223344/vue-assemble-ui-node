@@ -64,13 +64,13 @@ export class NpmPackage {
      */
     @routerDec.RequestMapping('/getNpmById', MyType.post)
     async getNpmById(
-        @routerDec.RequestParams('String', 'NpmId') NpmId: string,
+        @routerDec.RequestParams('String', 'id') id: string,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
         const response = new BaseResponse<NpmPublish[]>();
 
         try {
-            response._datas = await NpmPackage.PackageServices.getNpmByIds(NpmId);
+            response._datas = await NpmPackage.PackageServices.getNpmByIds(id);
             response.changeType(BackType.success);
         } catch (e) {
             response._msg = e;
@@ -117,6 +117,30 @@ export class NpmPackage {
 
         try {
             response._datas = await NpmPackage.PackageServices.getAllNpm();
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = e;
+        }
+
+        res.send(response);
+    }
+
+    /**
+     * 通过id删除npm包
+     * @group npm包管理
+     * @route POST /package/npmPackage/delectNpmById
+     * @param {string} id.formData.required 以,分割的npm包的id
+     * @returns {Promise} 200 - 返回npm包信息数组
+     */
+    @routerDec.RequestMapping('/delectNpmById', MyType.post)
+    async delectNpmById(
+        @routerDec.RequestParams('String', 'id') id: string,
+        @routerDec.Response() res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<boolean>();
+
+        try {
+            response._datas = await NpmPackage.PackageServices.delectNpmByIds(id);
             response.changeType(BackType.success);
         } catch (e) {
             response._msg = e;

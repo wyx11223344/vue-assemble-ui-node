@@ -13,4 +13,10 @@ export interface ComponentsServicesImp {
      * 获取全部组件信息
      */
     getAllComponents(): Promise<Components[]>;
+
+    /**
+     * 通过ids删除组件信息
+     * @param {string} Ids ,拼接ids
+     */
+    removeComponentsByIds(Ids: string): Promise<boolean>;
 }

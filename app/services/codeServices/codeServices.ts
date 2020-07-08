@@ -69,4 +69,65 @@ export default class CodeServices implements CodeSercicesImp{
             });
         });
     }
+
+    /**
+     * 通过id删除代码片段
+     * @param {Number} Id 组件id
+     * @returns {Promise<boolean>}
+     */
+    private static removeCodesById(Id: number): Promise<boolean> {
+        return CodesMapper.removeCodeById(Id);
+    }
+
+    /**
+     * 通过ids删除代码片段
+     * @param {String} Ids ids字符串
+     * @param {Number} componentId 组件id用作缓存判断
+     * @returns {Promise<boolean>}
+     */
+    @RedisDec.CacheEvict('Codes', 'getCodes', '#componentId')
+    removeCodesByIds(Ids: string, componentId?: number): Promise<boolean> {
+        let checkNum = 0;
+        let checkStatus = true;
+        return new Promise((resolve) => {
+            Ids.split(',').forEach((item: string) => {
+                CodeServices.removeCodesById(Number(item)).then((results: boolean) => {
+                    if (!results) {checkStatus = false;}
+                    if (checkNum >= Ids.split(',').length) {
+                        resolve(checkStatus);
+                    }
+                });
+            });
+        });
+    }
+
+    /**
+     * 通过组件id删除全部代码片段
+     * @param {Number} Id 组件id
+     * @returns {Promise<boolean>}
+     */
+    @RedisDec.CacheEvict('Codes', 'getCodes', '#componentId')
+    private static removeCodesByComponentsId(Id: number): Promise<boolean> {
+        return CodesMapper.removeCodeByComponentsId(Id);
+    }
+
+    /**
+     * 通过组件ids删除全部代码片段
+     * @param {String} Ids 组件ids
+     * @returns {Promise<boolean>}
+     */
+    removeCodesByComponentsIds(Ids: string): Promise<boolean> {
+        let checkNum = 0;
+        let checkStatus = true;
+        return new Promise((resolve) => {
+            Ids.split(',').forEach((item: string) => {
+                CodeServices.removeCodesByComponentsId(Number(item)).then((results: boolean) => {
+                    if (!results) {checkStatus = false;}
+                    if (checkNum >= Ids.split(',').length) {
+                        resolve(checkStatus);
+                    }
+                });
+            });
+        });
+    }
 }

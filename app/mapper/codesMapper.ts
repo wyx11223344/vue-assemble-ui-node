@@ -4,6 +4,40 @@ import Codes from '../models/codes';
 export default class CodesMapper {
 
     /**
+     * 通过id删除代码片段
+     * @param {number} ComponentId 组件id
+     * @returns {Promise<boolean>}
+     */
+    static removeCodeById(CodeId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            MySql.query('DELETE FROM codes WHERE id = ' + CodeId)
+                .then(() => {
+                    resolve(true);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    /**
+     * 通过组件id删除全部代码片段
+     * @param {Number} componentId 组件id
+     * @returns {Promise<boolean>}
+     */
+    static removeCodeByComponentsId(componentId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            MySql.query('DELETE FROM codes WHERE componentId = ' + componentId)
+                .then(() => {
+                    resolve(true);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    /**
      * 获取代码数组
      * @param {Number} componentId 组件id
      * @returns {Promise<any>} 返回结果

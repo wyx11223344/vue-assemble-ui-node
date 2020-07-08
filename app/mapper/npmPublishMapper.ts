@@ -25,8 +25,8 @@ export default class NpmPublishMapper {
     static delectNpmById(NpmId: number): Promise<any> {
         return new Promise((resolve, reject) => {
             MySql.query('DELETE FROM npmPublish WHERE id =  ' + NpmId)
-                .then((results) => {
-                    resolve(results);
+                .then(() => {
+                    resolve(true);
                 })
                 .catch((e) => {
                     reject(e);

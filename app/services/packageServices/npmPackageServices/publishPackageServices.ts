@@ -16,6 +16,23 @@ export default class PublishPackageServices implements PublishPackageServicesImp
     private static runningObj: Array<NpmRedisObj> = [];
 
     /**
+     * 通过npm id删除npm网络上的npm包
+     * @param {String} npmName npm包名字
+     * @return {Promise<boolean>}
+     */
+    async removePackage(npmName: string): Promise<boolean> {
+        return await new Promise((resolve) => {
+            exec(`npm unpublish @wyx962717593/${npmName}`, (error, stdout, stderr) => {
+                if (error) {
+                    resolve(false);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    /**
      * 添加一个新的redis npm包管理缓存
      * @param {String} path 路径
      * @param {Object} componentsObj 构成npm包对象
@@ -196,6 +213,10 @@ export default {
         });
     }
 
+    /**
+     * npm包更新新增运行器
+     * @returns {Promise<void>}
+     */
     private static async npmRunFn(): Promise<void> {
         if (this.runningObj.length >= 2) {return ;}
 

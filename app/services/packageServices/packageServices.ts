@@ -2,8 +2,10 @@ import {PackageServicesImp} from './packageServicesImp';
 import NpmPublish from '../../models/npmPublish';
 import NpmPublishMapper from '../../mapper/npmPublishMapper';
 import RedisDec from '../../decorators/redisDec';
+import PublishPackageServices from './npmPackageServices/publishPackageServices';
 
 export default class PackageServices implements PackageServicesImp{
+    private static PublishPackageServices: PublishPackageServices = new PublishPackageServices()
 
     /**
      * 通过id查询npm详细信息
@@ -11,12 +13,49 @@ export default class PackageServices implements PackageServicesImp{
      * @returns {Promise<any>}
      */
     @RedisDec.Cacheable('NpmPublish', '#npmId')
-    async getNpmById(npmId: number): Promise<NpmPublish> {
+    private static async getNpmById(npmId: number): Promise<NpmPublish> {
         return NpmPublishMapper.getNpmById(npmId);
     }
 
     /**
-     *
+     * 通过id删除npm包
+     * @param {String} npmId npm包的id
+     * @returns {Promise<any>}
+     */
+    @RedisDec.CacheEvict('NpmPublish', 'getNpmById', '#npmId')
+    private static async delectNpmById(npmId: number): Promise<boolean> {
+        const getNpm: NpmPublish = await PackageServices.getNpmById(npmId);
+        if (!await PackageServices.PublishPackageServices.removePackage(getNpm.name)) {
+            return false;
+        }
+        return NpmPublishMapper.delectNpmById(npmId);
+    }
+
+    /**
+     * 通过ids删除npm包
+     * @param {String} npmId npm包的id
+     * @returns {Promise<any>}
+     */
+    @RedisDec.Cacheable('NpmPublish', '#npmId')
+    async delectNpmByIds(npmIds: string): Promise<boolean> {
+        let checkNum = 0;
+        let checkStatus = true;
+        return new Promise((resolve) => {
+            npmIds.split(',').forEach((item: string) => {
+                PackageServices.getNpmById(Number(item)).then((result: NpmPublish) => {
+                    PackageServices.delectNpmById(result.id).then((results: boolean) => {
+                        if (!results) {checkStatus = false;}
+                        if (checkNum >= npmIds.split(',').length) {
+                            resolve(checkStatus);
+                        }
+                    });
+                });
+            });
+        });
+    }
+
+    /**
+     * 通过id字符串组查询包信息
      * @param npmIds
      * @returns {Promise<void>}
      */
@@ -25,7 +64,7 @@ export default class PackageServices implements PackageServicesImp{
         let checkNum = 0;
         return new Promise((resolve) => {
             npmIds.split(',').forEach((item: string) => {
-                this.getNpmById(Number(item)).then((result: NpmPublish) => {
+                PackageServices.getNpmById(Number(item)).then((result: NpmPublish) => {
                     backList.push(result);
                     checkNum++;
                     if (checkNum >= npmIds.split(',').length) {
@@ -56,7 +95,7 @@ export default class PackageServices implements PackageServicesImp{
     async setNpm(npmPublish: NpmPublish, npmId?: number): Promise<boolean> {
         return new Promise(async (resolve) => {
             if (npmId) {
-                const npmObj: NpmPublish = await this.getNpmById(npmId);
+                const npmObj: NpmPublish = await PackageServices.getNpmById(npmId);
 
                 // 判断版本信息问题
                 if (npmObj && npmObj.version >= npmPublish.version) {

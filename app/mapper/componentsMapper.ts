@@ -20,6 +20,23 @@ export default class ComponentsMapper {
     }
 
     /**
+     * 通过id删除组件
+     * @param {number} ComponentId 组件id
+     * @returns {Promise<boolean>}
+     */
+    static removeComponentById(ComponentId: number): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            MySql.query('DELETE FROM components WHERE id = ' + ComponentId)
+                .then(() => {
+                    resolve(true);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    /**
      * 保存新组件
      * @param {Components} components 新增对象
      * @returns {Promise<any>} 返回结果

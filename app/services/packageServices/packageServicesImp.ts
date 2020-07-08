@@ -6,13 +6,13 @@ export interface PackageServicesImp {
      * 通过id获取npm信息
      * @param {String} npmId npmId号
      */
-    getNpmById(npmId: number): Promise<NpmPublish>;
+    getNpmByIds(npmId: string): Promise<NpmPublish[]>;
 
     /**
-     * 查询id获取信息通过ids（推荐使用改方法）
-     * @param npmIds 以,拼接
+     * 通过ids删除npm包
+     * @param {String} npmIds 拼接ids
      */
-    getNpmByIds(npmIds: string): Promise<NpmPublish[]>;
+    delectNpmByIds(npmIds: string): Promise<boolean>;
 
     /**
      * 通过name获取npm信息

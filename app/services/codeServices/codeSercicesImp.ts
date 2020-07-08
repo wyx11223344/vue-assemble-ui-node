@@ -19,4 +19,16 @@ export interface CodeSercicesImp {
      * @param {Codes[]} Codes 保存对象
      */
     setCodes(Codes: Codes[]): Promise<boolean>;
+
+    /**
+     * 通过ids删除多个代码片段
+     * @param {String} Ids ,拼接字符串
+     */
+    removeCodesByIds(Ids: string): Promise<boolean>;
+
+    /**
+     * 通过组件ids删除代码片段
+     * @param {String} Ids ,拼接字符串
+     */
+    removeCodesByComponentsIds(Ids: string): Promise<boolean>;
 }
