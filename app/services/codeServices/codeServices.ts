@@ -28,7 +28,10 @@ export default class CodeServices implements CodeSercicesImp{
                 // 执行查询组件代码服务
                 (async (): Promise<void> => {
                     const getCodes: Codes[] = await this.getCodes(componentId);
-                    ComponentCodes[getCodes.find((item: Codes) => item.type === 1).name] = getCodes;
+                    // TODO 需要添加说明接口注释
+                    if (getCodes.find((item: Codes) => item.type === 1)) {
+                        ComponentCodes[getCodes.find((item: Codes) => item.type === 1).name] = getCodes;
+                    }
                     checkCodePromise++;
                     if (checkCodePromise >= componentIds.length) {
                         resolve(ComponentCodes);
