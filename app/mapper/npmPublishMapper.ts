@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: npmPublish数据库映射操作
+*/
 import MySql from '../db';
 import NpmPublish from '../models/npmPublish';
 
@@ -40,7 +45,7 @@ export default class NpmPublishMapper {
      */
     static getNpmById(npmId: number): Promise<any> | [] {
         return new Promise((resolve, reject) => {
-            MySql.query('select * from npmPublish where id' + npmId)
+            MySql.query('select * from npmPublish where id = ' + npmId)
                 .then((results) => {
                     resolve(results);
                 })

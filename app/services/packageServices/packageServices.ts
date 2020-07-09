@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: npm包数据库操作服务
+*/
 import {PackageServicesImp} from './packageServicesImp';
 import NpmPublish from '../../models/npmPublish';
 import NpmPublishMapper from '../../mapper/npmPublishMapper';
@@ -40,7 +45,7 @@ export default class PackageServices implements PackageServicesImp{
     async delectNpmByIds(npmIds: string): Promise<boolean> {
         let checkNum = 0;
         let checkStatus = true;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             npmIds.split(',').forEach((item: string) => {
                 PackageServices.getNpmById(Number(item)).then((result: NpmPublish) => {
                     PackageServices.delectNpmById(result.id).then((results: boolean) => {
@@ -48,7 +53,11 @@ export default class PackageServices implements PackageServicesImp{
                         if (checkNum >= npmIds.split(',').length) {
                             resolve(checkStatus);
                         }
+                    }).catch(() => {
+                        reject();
                     });
+                }).catch(() => {
+                    reject();
                 });
             });
         });
@@ -62,15 +71,19 @@ export default class PackageServices implements PackageServicesImp{
     async getNpmByIds(npmIds: string): Promise<NpmPublish[]> {
         const backList: NpmPublish[] = [];
         let checkNum = 0;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             npmIds.split(',').forEach((item: string) => {
-                PackageServices.getNpmById(Number(item)).then((result: NpmPublish) => {
-                    backList.push(result);
-                    checkNum++;
-                    if (checkNum >= npmIds.split(',').length) {
-                        resolve(backList);
-                    }
-                });
+                PackageServices.getNpmById(Number(item))
+                    .then((result: NpmPublish) => {
+                        backList.push(result);
+                        checkNum++;
+                        if (checkNum >= npmIds.split(',').length) {
+                            resolve(backList);
+                        }
+                    })
+                    .catch(() => {
+                        reject();
+                    });
             });
         });
     }

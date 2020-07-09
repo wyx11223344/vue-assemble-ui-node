@@ -6,6 +6,7 @@
 import {CodeOnlineServicesImp} from './codeOnlineServicesImp';
 import * as less from 'less';
 import {HtmlObj} from '../../../types/codes';
+import {BaseErrorMsg} from '../../../types/baseBackMsg';
 
 interface LessRender {
     css: string;
@@ -27,8 +28,7 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
             try {
                 aList = JSON.parse(a);
             } catch (e) {
-                throw Error(e);
-                // return '请传入正常的json字符串';
+                return BaseErrorMsg.jsonError;
             }
 
             let baseObje = {
@@ -41,7 +41,8 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
             for (let index = 0; index < aList.length; index++) {
                 const item = aList[index];
                 try {
-                    const script: string = CodeOnlineServices.getSource(item.html, 'script').replace(/export default/, 'return');
+                    let script: string = CodeOnlineServices.getSource(item.html, 'script').replace(/export default/, 'return');
+                    script = script ? script : '{}';
                     if (index === 0) {
                         template = '<div id="app">' + CodeOnlineServices.getSource(item.html, 'template') + '</div>';
                         baseObje = new Function(script)();
@@ -53,21 +54,19 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
                     }
 
                 } catch (e) {
-                    return 'scrpit代码解析失败，请检查';
+                    return BaseErrorMsg.scriptError;
                 }
                 try {
                     const style: string = CodeOnlineServices.getSource(item.html, 'style');
                     const lessRender: LessRender = await less.render(style);
                     cssStyle += lessRender.css;
                 } catch (e) {
-                    return 'less渲染失败，请检查less是否有位置参数等问题!\n';
+                    return BaseErrorMsg.lessError;
                 }
             }
 
             const backJs: string = CodeOnlineServices.createJs(baseObje, listObj);
             backString = `${template}\n${backJs}\n<style>\n${cssStyle}</style>\n`;
-        } else {
-            backString = '没有找到缓存\n';
         }
 
         return backString;

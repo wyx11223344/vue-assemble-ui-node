@@ -67,9 +67,9 @@ export class RouterDec {
                 if (this.ParamsObj[propertyKey]) {
                     Object.keys(this.ParamsObj[propertyKey]).forEach((item) => {
                         if (type === MyType.post) {
-                            paramsList[this.ParamsObj[propertyKey][item].index] = this.ParamsObj[propertyKey][item].type(arg[0].body[item]);
+                            paramsList[this.ParamsObj[propertyKey][item].index] = arg[0].body[item] ? this.ParamsObj[propertyKey][item].type(arg[0].body[item]) : arg[0].body[item];
                         } else if (type === MyType.get) {
-                            paramsList[this.ParamsObj[propertyKey][item].index] = this.ParamsObj[propertyKey][item].type(arg[0].query[item]);
+                            paramsList[this.ParamsObj[propertyKey][item].index] = arg[0].query[item] ? this.ParamsObj[propertyKey][item].type(arg[0].query[item]) : arg[0].query[item];
                         }
                     });
                 }

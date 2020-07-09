@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: codes数据库操作映射
+*/
 import MySql from '../db';
 import Codes from '../models/codes';
 

@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: npm包数据库操作接口定义
+*/
 import NpmPublish from '../../models/npmPublish';
 
 export interface PackageServicesImp {

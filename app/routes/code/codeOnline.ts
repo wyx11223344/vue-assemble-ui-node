@@ -1,13 +1,15 @@
 /**
  * @author WYX
- * @date 2020/7/1
- * @Description: 在线编辑器接口
+ * @date 2020/7/9
+ * @Description: 代码操作接口
 */
 import * as express from 'express';
 import TemplateHTML from '../../template/defaultIframe';
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import MyRedis from '../../cache';
 import CodeOnlineServices from '../../services/codeServices/codeOnlineServices/codeOnlineServices';
+import BaseResponse from '../../models/baseResponse';
+import {BaseErrorMsg} from '../../types/baseBackMsg';
 const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('/code/codeOnline')
@@ -29,13 +31,19 @@ export class CodeOnline {
         @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
+        const response = new BaseResponse<boolean>();
+
         try {
             MyRedis.set(findId, sendHtml);
             MyRedis.exp(findId, 10);
-            res.send(true);
+
+            response._datas = true;
         } catch (e) {
-            res.send(e);
+            response._datas = false;
+            response._msg = BaseErrorMsg.redisError;
         }
+
+        res.json(response);
     }
 
     /**

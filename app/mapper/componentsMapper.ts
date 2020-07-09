@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: components数据库映射操作
+*/
 import MySql from '../db';
 import Components from '../models/components';
 

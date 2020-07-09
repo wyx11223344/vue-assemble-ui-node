@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: npm包管理
+*/
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import * as express from 'express';
 import Codes from '../../models/codes';
@@ -6,6 +11,7 @@ import PublishPackageServices from '../../services/packageServices/npmPackageSer
 import PackageServices from '../../services/packageServices/packageServices';
 import BaseResponse, {BackType} from '../../models/baseResponse';
 import NpmPublish from '../../models/npmPublish';
+import { BaseErrorMsg, BaseSuccessMsg} from '../../types/baseBackMsg';
 
 const routerDec: RouterDec = new RouterDec();
 
@@ -33,26 +39,35 @@ export class NpmPackage {
         @routerDec.RequestParams('String', 'version') version: string,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
-        if (!id && (await NpmPackage.PackageServices.getNpmByName(name)).length > 0) {
-            res.send(false);
-            return ;
+        const response = new BaseResponse<NpmPublish[]>();
+
+        try {
+            if (!id && (await NpmPackage.PackageServices.getNpmByName(name)).length > 0) {
+                throw BaseErrorMsg.saveNpmName;
+            }
+
+            const npmPublish: NpmPublish = new NpmPublish(id, name, componentsId, version);
+
+            if (!await NpmPackage.PackageServices.setNpm(npmPublish, npmPublish.id)) {
+                throw BaseErrorMsg.sqlError;
+            }
+
+            const componentIds: number[] = componentsId.split(',').map((item: string) => Number(item));
+
+            // 获取代码数组
+            const ComponentsCodes: {[a: string]: Codes[]} = await NpmPackage.CodeServices.getCodesByIds(componentIds);
+
+            if (!await NpmPackage.PublishPackageServices.addNewPackage(name, ComponentsCodes, version)) {
+                throw BaseErrorMsg.redisError;
+            }
+
+            response.changeType(BackType.success);
+            response._msg = BaseSuccessMsg.saveNpm;
+        } catch (e) {
+            response._msg = e;
         }
 
-        const npmPublish: NpmPublish = new NpmPublish(id, name, componentsId, version);
-
-        if (!await NpmPackage.PackageServices.setNpm(npmPublish, npmPublish.id)) {
-            res.send(false);
-            return ;
-        }
-
-        const componentIds: number[] = componentsId.split(',').map((item: string) => Number(item));
-
-        // 获取代码数组
-        const ComponentsCodes: {[a: string]: Codes[]} = await NpmPackage.CodeServices.getCodesByIds(componentIds);
-
-        await NpmPackage.PublishPackageServices.addNewPackage(name, ComponentsCodes, version);
-
-        res.send(ComponentsCodes);
+        res.send(response);
     }
 
     /**
@@ -73,7 +88,7 @@ export class NpmPackage {
             response._datas = await NpmPackage.PackageServices.getNpmByIds(id);
             response.changeType(BackType.success);
         } catch (e) {
-            response._msg = e;
+            response._msg = BaseErrorMsg.sqlError;
         }
 
         res.send(response);
@@ -97,7 +112,7 @@ export class NpmPackage {
             response._datas = await NpmPackage.PackageServices.getNpmByName(NpmName);
             response.changeType(BackType.success);
         } catch (e) {
-            response._msg = e;
+            response._msg = BaseErrorMsg.sqlError;
         }
 
         res.send(response);
@@ -119,7 +134,7 @@ export class NpmPackage {
             response._datas = await NpmPackage.PackageServices.getAllNpm();
             response.changeType(BackType.success);
         } catch (e) {
-            response._msg = e;
+            response._msg = BaseErrorMsg.sqlError;
         }
 
         res.send(response);
@@ -143,7 +158,7 @@ export class NpmPackage {
             response._datas = await NpmPackage.PackageServices.delectNpmByIds(id);
             response.changeType(BackType.success);
         } catch (e) {
-            response._msg = e;
+            response._msg = BaseErrorMsg.sqlError;
         }
 
         res.send(response);

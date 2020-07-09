@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: npm包发布接口
+*/
 import * as downloadGit from 'download-git-repo';
 import Codes from '../../../models/codes';
 import * as fs from 'fs';

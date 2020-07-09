@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: 代码操作接口定义
+*/
 import Codes from '../../models/codes';
 
 export interface CodeSercicesImp {

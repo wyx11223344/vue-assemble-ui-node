@@ -1,7 +1,13 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: 代码操作服务接口
+*/
 import {CodeSercicesImp} from './codeSercicesImp';
 import Codes from '../../models/codes';
 import CodesMapper from '../../mapper/codesMapper';
 import RedisDec from '../../decorators/redisDec';
+import {BaseErrorMsg} from '../../types/baseBackMsg';
 
 export default class CodeServices implements CodeSercicesImp{
 
@@ -21,23 +27,27 @@ export default class CodeServices implements CodeSercicesImp{
      * @returns {Promise<{[p: string]: Codes[]}>}
      */
     async getCodesByIds(componentIds: number[]): Promise<{[a: string]: Codes[]}> {
-        return await new Promise((resolve) => {
-            let checkCodePromise = 0;
-            let ComponentCodes: {[a: string]: Codes[]} = {};
-            componentIds.forEach((componentId: number) => {
-                // 执行查询组件代码服务
-                (async (): Promise<void> => {
-                    const getCodes: Codes[] = await this.getCodes(componentId);
-                    // TODO 需要添加说明接口注释
-                    if (getCodes.find((item: Codes) => item.type === 1)) {
-                        ComponentCodes[getCodes.find((item: Codes) => item.type === 1).name] = getCodes;
-                    }
-                    checkCodePromise++;
-                    if (checkCodePromise >= componentIds.length) {
-                        resolve(ComponentCodes);
-                    }
-                })();
-            });
+        return await new Promise((resolve, reject) => {
+            try {
+                let checkCodePromise = 0;
+                let ComponentCodes: {[a: string]: Codes[]} = {};
+                componentIds.forEach((componentId: number) => {
+                    // 执行查询组件代码服务
+                    (async (): Promise<void> => {
+                        const getCodes: Codes[] = await this.getCodes(componentId);
+                        // TODO 需要添加说明接口注释
+                        if (getCodes.find((item: Codes) => item.type === 1)) {
+                            ComponentCodes[getCodes.find((item: Codes) => item.type === 1).name] = getCodes;
+                        }
+                        checkCodePromise++;
+                        if (checkCodePromise >= componentIds.length) {
+                            resolve(ComponentCodes);
+                        }
+                    })();
+                });
+            } catch (e) {
+                reject(BaseErrorMsg.sqlError);
+            }
         });
     }
 
@@ -92,14 +102,18 @@ export default class CodeServices implements CodeSercicesImp{
     removeCodesByIds(Ids: string, componentId?: number): Promise<boolean> {
         let checkNum = 0;
         let checkStatus = true;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             Ids.split(',').forEach((item: string) => {
-                CodeServices.removeCodesById(Number(item)).then((results: boolean) => {
-                    if (!results) {checkStatus = false;}
-                    if (checkNum >= Ids.split(',').length) {
-                        resolve(checkStatus);
-                    }
-                });
+                CodeServices.removeCodesById(Number(item))
+                    .then((results: boolean) => {
+                        if (!results) {checkStatus = false;}
+                        checkNum++;
+                        if (checkNum >= Ids.split(',').length) {
+                            resolve(checkStatus);
+                        }
+                    }).catch((e) => {
+                        reject(e);
+                    });
             });
         });
     }
@@ -122,13 +136,16 @@ export default class CodeServices implements CodeSercicesImp{
     removeCodesByComponentsIds(Ids: string): Promise<boolean> {
         let checkNum = 0;
         let checkStatus = true;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             Ids.split(',').forEach((item: string) => {
                 CodeServices.removeCodesByComponentsId(Number(item)).then((results: boolean) => {
                     if (!results) {checkStatus = false;}
+                    checkNum++;
                     if (checkNum >= Ids.split(',').length) {
                         resolve(checkStatus);
                     }
+                }).catch((e) => {
+                    reject(e);
                 });
             });
         });

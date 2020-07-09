@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: 组件操作服务接口
+*/
 import {ComponentsServicesImp} from './componentsServicesImp';
 import RedisDec from '../../decorators/redisDec';
 import Components from '../../models/components';
@@ -48,13 +53,16 @@ export default class ComponentsServices implements ComponentsServicesImp {
     removeComponentsByIds(Ids: string): Promise<boolean> {
         let checkNum = 0;
         let checkStatus = true;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             Ids.split(',').forEach((item: string) => {
                 ComponentsServices.removeComponentsById(Number(item)).then((results: boolean) => {
                     if (!results) {checkStatus = false;}
+                    checkNum++;
                     if (checkNum >= Ids.split(',').length) {
                         resolve(checkStatus);
                     }
+                }).catch((e) => {
+                    reject(e);
                 });
             });
         });

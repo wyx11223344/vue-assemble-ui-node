@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: codeTypes实体
+*/
 export default class CodeTypes {
     private _id: number;
     private _typename: string;

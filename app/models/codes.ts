@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: Codes实体
+*/
 export default class Codes {
     private _id: number;
     private _name: string;

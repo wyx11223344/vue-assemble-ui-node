@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: 基础返回实体
+*/
 export enum BackType {
     'success' = 'success',
     'dealError' = 'dealError',
@@ -8,12 +13,6 @@ export enum CodesType {
     'success' = 200,
     'dealError' = 500,
     'paramsError' = 401
-}
-
-export enum BackMsg {
-    'success' = 'deal success',
-    'dealError' = 'node deal a error result',
-    'paramsError' = 'node just get a bad params'
 }
 
 export default class BaseResponse<T> {
@@ -57,7 +56,6 @@ export default class BaseResponse<T> {
      */
     changeType(baseRes: BackType): void {
         this.codes = CodesType[baseRes];
-        this.msg = BackMsg[baseRes];
     }
 
 }

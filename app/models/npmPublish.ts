@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: npmPublish实体
+*/
 export default class NpmPublish{
     private _id: number;
     private _name: string;

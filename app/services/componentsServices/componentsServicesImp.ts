@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: 组件操作接口定义
+*/
 import Components from '../../models/components';
 
 export interface ComponentsServicesImp {

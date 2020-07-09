@@ -1,3 +1,8 @@
+/**
+ * @author WYX
+ * @date 2020/7/9
+ * @Description: components实体
+*/
 export default class Components{
     private _id: number;
     private _name: string;
