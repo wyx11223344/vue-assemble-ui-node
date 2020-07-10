@@ -8,4 +8,5 @@ export interface HtmlObj {
     name: string;
     html: string;
     componentId?: number;
+    type?: number;
 }

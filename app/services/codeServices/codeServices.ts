@@ -54,9 +54,11 @@ export default class CodeServices implements CodeSercicesImp{
     /**
      * 保存代码
      * @param {Codes[]} Codes 传递Codes对象数组
+     * @param {Number} componentId 用作清空缓存
      * @returns {Promise<boolean>} 返回结果
      */
-    setCodes(Codes: Codes[]): Promise<boolean> {
+    @RedisDec.CacheEvict('Codes', 'getCodes', '#componentId')
+    setCodes(Codes: Codes[], componentId: number): Promise<boolean> {
         return new Promise((resolve) => {
             let checkNum = 0;
             let checkStatus = true;

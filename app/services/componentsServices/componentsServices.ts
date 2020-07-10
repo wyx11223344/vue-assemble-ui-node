@@ -16,10 +16,10 @@ export default class ComponentsServices implements ComponentsServicesImp {
      * @param {Number} componentId 组件id值，用作缓存清除
      * @returns {Promise<number>} 返回id
      */
-    @RedisDec.CacheEvict('Codes', 'getCodes', '#componentId')
     @RedisDec.CacheEvict('Components', 'getAllComponents')
     setComponent(components: Components, componentId?: number): Promise<number> {
         if (componentId) {
+            console.log(componentId);
             return ComponentsMapper.updateComponents(components).then((r) => r.insertId);
         } else {
             return ComponentsMapper.setNewComponents(components).then((r) => r.insertId);

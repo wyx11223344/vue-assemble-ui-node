@@ -67,7 +67,7 @@ export default class ComponentsMapper {
      */
     static updateComponents(components: Components): Promise<any> {
         let sets = '';
-        Object.keys(components).filter((item: string) => item !== 'id').forEach((item) => {
+        Object.keys(components).filter((item: string) => item !== '_id').forEach((item) => {
             const key = item.replace('_', '');
             if (components[key]) {
                 sets += sets ? `, ${key} = '${components[item]}'` : `set ${key} = '${components[item]}'`;
@@ -76,6 +76,7 @@ export default class ComponentsMapper {
 
         if (!sets) {
             return new Promise((resolve) => {
+                console.log(components);
                 resolve({
                     insertId: components.id
                 });

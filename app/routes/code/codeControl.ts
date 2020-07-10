@@ -63,19 +63,22 @@ export class CodeControl {
         @routerDec.Response() res: express.Response
     ): Promise<void> {
         const getHtml: HtmlObj[] = JSON.parse(sendHtml ? sendHtml : '[]');
-        const response = new BaseResponse<boolean>();
+        const response = new BaseResponse<number>();
 
         if (!id && !name) {
             response._msg = BaseErrorMsg.paramsError;
         } else {
             try {
-                const componentId = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null), id);
+                const componentId: number = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null), id);
 
                 if (getHtml.length > 0) {
-                    const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId));
-                    response._datas = await CodeControl.CodeServices.setCodes(codes);
+                    const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId, item.type));
+                    if (!await CodeControl.CodeServices.setCodes(codes, componentId)) {
+                        throw new Error();
+                    }
                 }
 
+                response._datas = componentId;
                 response.changeType(BackType.success);
             } catch (e) {
                 response._msg = BaseErrorMsg.sqlError;
@@ -85,38 +88,38 @@ export class CodeControl {
         res.json(response);
     }
 
+    // /**
+    //  * 保存代码
+    //  * @route POST /code/CodeControl/saveCodeTemplate
+    //  * @group 代码控制
+    //  * @param {string} sendHtml.formData.required 组件code数组
+    //  * @returns {Promise} 200 - 返回查询结果
+    //  * @returns {Promise} 500 - 返回错误原因
+    //  */
+    // @routerDec.RequestMapping('/saveCodeTemplate', MyType.post)
+    // async saveCodeTemplate(
+    //     @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
+    //     @routerDec.Response() res: express.Response
+    // ): Promise<void> {
+    //     const getHtml: HtmlObj[] = JSON.parse(sendHtml ? sendHtml : '[]');
+    //     const response = new BaseResponse<boolean>();
+    //
+    //     try {
+    //         if (getHtml.length > 0) {
+    //             const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, item.componentId, item.type));
+    //             response._datas = await CodeControl.CodeServices.setCodes(codes);
+    //         }
+    //
+    //         response.changeType(BackType.success);
+    //     } catch (e) {
+    //         response._msg = BaseErrorMsg.sqlError;
+    //     }
+    //
+    //     res.json(response);
+    // }
+
     /**
-     * 保存代码
-     * @route POST /code/CodeControl/saveCodeTemplate
-     * @group 代码控制
-     * @param {string} sendHtml.formData.required 组件code数组
-     * @returns {Promise} 200 - 返回查询结果
-     * @returns {Promise} 500 - 返回错误原因
-     */
-    @routerDec.RequestMapping('/saveCodeTemplate', MyType.post)
-    async saveCodeTemplate(
-        @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
-        @routerDec.Response() res: express.Response
-    ): Promise<void> {
-        const getHtml: HtmlObj[] = JSON.parse(sendHtml ? sendHtml : '[]');
-        const response = new BaseResponse<boolean>();
-
-        try {
-            if (getHtml.length > 0) {
-                const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, item.componentId));
-                response._datas = await CodeControl.CodeServices.setCodes(codes);
-            }
-
-            response.changeType(BackType.success);
-        } catch (e) {
-            response._msg = BaseErrorMsg.sqlError;
-        }
-
-        res.json(response);
-    }
-
-    /**
-     * 获取全部npm包
+     * 获取全部组件
      * @route POST /code/CodeControl/getAllComponents
      * @group 代码控制
      * @returns {Promise} 200 - 返回查询结果

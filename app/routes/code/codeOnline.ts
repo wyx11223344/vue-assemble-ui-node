@@ -8,8 +8,9 @@ import TemplateHTML from '../../template/defaultIframe';
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import MyRedis from '../../cache';
 import CodeOnlineServices from '../../services/codeServices/codeOnlineServices/codeOnlineServices';
-import BaseResponse from '../../models/baseResponse';
+import BaseResponse, {BackType} from '../../models/baseResponse';
 import {BaseErrorMsg} from '../../types/baseBackMsg';
+
 const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('/code/codeOnline')
@@ -38,6 +39,7 @@ export class CodeOnline {
             MyRedis.exp(findId, 10);
 
             response._datas = true;
+            response.changeType(BackType.success);
         } catch (e) {
             response._datas = false;
             response._msg = BaseErrorMsg.redisError;

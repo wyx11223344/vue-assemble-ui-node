@@ -22,8 +22,9 @@ export interface CodeSercicesImp {
     /**
      * 保存html代码
      * @param {Codes[]} Codes 保存对象
+     * @param {Number} componentId 用作清空缓存
      */
-    setCodes(Codes: Codes[]): Promise<boolean>;
+    setCodes(Codes: Codes[], componentId: number): Promise<boolean>;
 
     /**
      * 通过ids删除多个代码片段

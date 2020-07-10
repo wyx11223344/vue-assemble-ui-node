@@ -66,10 +66,11 @@ export default class CodesMapper {
      */
     static setCodesByComId(Codes: Codes): Promise<any> {
         return new Promise((resolve, reject) => {
-            MySql.queryArgs('INSERT INTO codes (name, html, componentId) VALUES (?, ?, ?)', [
+            MySql.queryArgs('INSERT INTO codes (name, html, componentId, type) VALUES (?, ?, ?, ?)', [
                 Codes.name,
                 Codes.html,
-                Codes.componentId
+                Codes.componentId,
+                Codes.type
             ])
                 .then((results: any) => {
                     resolve(results);
@@ -87,10 +88,11 @@ export default class CodesMapper {
      */
     static updateCodesById(Codes: Codes): Promise<any> {
         return new Promise((resolve, reject) => {
-            MySql.queryArgs('UPDATE codes set name = ?, html = ?, componentId = ? where id = ?', [
+            MySql.queryArgs('UPDATE codes set name = ?, html = ?, componentId = ?, type = ? where id = ?', [
                 Codes.name,
                 Codes.html,
                 Codes.componentId,
+                Codes.type,
                 Codes.id
             ])
                 .then((results: any) => {
