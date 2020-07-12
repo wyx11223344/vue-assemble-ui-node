@@ -25,6 +25,23 @@ export default class ComponentsMapper {
     }
 
     /**
+     * 通过组件类型获取组件信息
+     * @param {Number} classify 组件类型
+     * @returns {Promise<Components[]>}
+     */
+    static getComponentsByClassify(classify: number): Promise<Components[]> {
+        return new Promise((resolve, reject) => {
+            MySql.query('select * from components where classify = ' + classify)
+                .then((results: Components[]) => {
+                    resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    /**
      * 通过id删除组件
      * @param {number} ComponentId 组件id
      * @returns {Promise<boolean>}
@@ -76,7 +93,6 @@ export default class ComponentsMapper {
 
         if (!sets) {
             return new Promise((resolve) => {
-                console.log(components);
                 resolve({
                     insertId: components.id
                 });

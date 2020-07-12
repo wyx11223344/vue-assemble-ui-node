@@ -8,14 +8,16 @@ export default class Components{
     private _name: string;
     private _type: number;
     private _usersId: number;
-    private _status: number
+    private _status: number;
+    private _classify: number;
 
-    constructor(id: number, name: string, type: number, usersId: number, status: number) {
+    constructor(id: number, name: string, type: number, usersId: number, status: number, classify?: number) {
         this._id = id;
         this._name = name;
         this._type = type;
         this._usersId = usersId;
         this._status = status;
+        this._classify = classify;
     }
 
     get id(): number {
@@ -56,5 +58,13 @@ export default class Components{
 
     set status(value: number) {
         this._status = value;
+    }
+
+    get classify(): number {
+        return this._classify;
+    }
+
+    set classify(value: number) {
+        this._classify = value;
     }
 }

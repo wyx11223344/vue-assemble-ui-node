@@ -9,10 +9,16 @@ export interface ComponentsServicesImp {
 
     /**
      * 保存新组件返回新组建id
-     * @param {Number} componentId 组件id值，用作缓存清除
+     * @param {Number} classify 组件类型
      * @param {Components} components 新组件名称
      */
-    setComponent(components: Components, componentId?: number): Promise<number>;
+    setComponent(components: Components, classify?: number): Promise<number>;
+
+    /**
+     * 通过classify获取组件信息
+     * @param {Number} classify 类别
+     */
+    getComponentsByClassify(classify: number): Promise<Components[]>;
 
     /**
      * 获取全部组件信息

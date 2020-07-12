@@ -52,6 +52,7 @@ export class CodeControl {
      * @param {string} name.formData 组件名称
      * @param {number} id.formData 组件id
      * @param {string} sendHtml.formData 组件code数组
+     * @param {number} classify.formData 组件类型
      * @returns {Promise} 200 - 返回查询结果
      * @returns {Promise} 500 - 返回错误原因
      */
@@ -60,6 +61,7 @@ export class CodeControl {
         @routerDec.RequestParams('String', 'name') name: string,
         @routerDec.RequestParams('Number', 'id') id: number,
         @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
+        @routerDec.RequestParams('String', 'classify') classify: number,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
         const getHtml: HtmlObj[] = JSON.parse(sendHtml ? sendHtml : '[]');
@@ -69,7 +71,7 @@ export class CodeControl {
             response._msg = BaseErrorMsg.paramsError;
         } else {
             try {
-                const componentId: number = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null), id);
+                const componentId: number = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null, classify), classify);
 
                 if (getHtml.length > 0) {
                     const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId, item.type));
@@ -117,6 +119,32 @@ export class CodeControl {
     //
     //     res.json(response);
     // }
+
+    /**
+     * 通过类别获取组件
+     * @route POST /code/CodeControl/getComponentsByClassify
+     * @group 代码控制
+     * @param {number} classify.formData.required 组件类别
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
+     */
+    @routerDec.RequestMapping('/getComponentsByClassify', MyType.post)
+    async getComponentsByClassify(
+        @routerDec.RequestParams('String', 'classify') classify: number,
+        @routerDec.Response() res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<Components[]>();
+
+        try {
+            response._datas = await CodeControl.ComponentsServices.getComponentsByClassify(classify);
+
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = BaseErrorMsg.sqlError;
+        }
+
+        res.json(response);
+    }
 
     /**
      * 获取全部组件

@@ -13,17 +13,26 @@ export default class ComponentsServices implements ComponentsServicesImp {
     /**
      * 保存新组件返回id
      * @param {Components} components 组件对象
-     * @param {Number} componentId 组件id值，用作缓存清除
+     * @param {Number} classify 组件i类型
      * @returns {Promise<number>} 返回id
      */
     @RedisDec.CacheEvict('Components', 'getAllComponents')
-    setComponent(components: Components, componentId?: number): Promise<number> {
-        if (componentId) {
-            console.log(componentId);
+    @RedisDec.CacheEvict('Components', 'getComponentsByClassify', '#classify')
+    setComponent(components: Components, classify?: number): Promise<number> {
+        if (components.id) {
             return ComponentsMapper.updateComponents(components).then((r) => r.insertId);
         } else {
             return ComponentsMapper.setNewComponents(components).then((r) => r.insertId);
         }
+    }
+
+    /**
+     * 通过classify获取组件信息
+     * @param {Number} classify 类别
+     */
+    @RedisDec.Cacheable('Components', '#classify')
+    getComponentsByClassify(classify: number): Promise<Components[]> {
+        return ComponentsMapper.getComponentsByClassify(classify);
     }
 
     /**
