@@ -22,7 +22,8 @@ const startHTML = '<!DOCTYPE html>\n' +
     '    </script>\n';
 
 const endHTML = '    </body>\n' +
-    '</html>\n';
+    '</html>\n' +
+    '<style>body{display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; position: absolute; margin: 0; padding: 0}</style>';
 
 export default class TemplateHTML {
     static startHTML: string = startHTML

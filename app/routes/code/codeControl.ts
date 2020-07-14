@@ -9,9 +9,11 @@ import ComponentsServices from '../../services/componentsServices/componentsServ
 import BaseResponse, {BackType} from '../../models/baseResponse';
 import Codes from '../../models/codes';
 import CodeServices from '../../services/codeServices/codeServices';
-import {HtmlObj} from '../../types/codes';
+import {BackComponents, HtmlObj} from '../../types/codes';
 import Components from '../../models/components';
 import {BaseErrorMsg} from '../../types/baseBackMsg';
+import MyRedis from '../../cache';
+import RandomWord from '../../utils/randomWord';
 const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('/code/CodeControl')
@@ -148,19 +150,68 @@ export class CodeControl {
 
     /**
      * 获取全部组件
+     * @route POST /code/CodeControl/getAllComponentsWithHtml
+     * @group 代码控制
+     * @param {number} num.formData 获取条数
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
+     */
+    @routerDec.RequestMapping('/getAllComponentsWithHtml', MyType.post)
+    async getAllComponentsWithHtml(
+        @routerDec.RequestParams('Number', 'num') num: number,
+        @routerDec.Response() res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<BackComponents[]>();
+
+        try {
+            const findComponents: BackComponents[] = await CodeControl.ComponentsServices.getAllComponents(num);
+
+            await new Promise((resolve, reject) => {
+                let checkNum = 0;
+                findComponents.forEach((item: BackComponents) => {
+                    CodeControl.CodeServices.getCodes(item.id).then((results: Codes[]) => {
+                        const getSign: string = RandomWord.getSign();
+                        item.htmlId = getSign;
+
+                        MyRedis.set(getSign, JSON.stringify(results));
+                        MyRedis.exp(getSign, 10);
+
+                        checkNum++;
+                        if (checkNum === findComponents.length) {
+                            resolve();
+                        }
+                    }).catch(() => {
+                        reject();
+                    });
+                });
+            });
+
+            response._datas = findComponents;
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = BaseErrorMsg.sqlError;
+        }
+
+        res.json(response);
+    }
+
+    /**
+     * 获取全部组件
      * @route POST /code/CodeControl/getAllComponents
      * @group 代码控制
+     * @param {number} num.formData 获取条数
      * @returns {Promise} 200 - 返回查询结果
      * @returns {Promise} 500 - 返回错误原因
      */
     @routerDec.RequestMapping('/getAllComponents', MyType.post)
     async getAllComponents(
+        @routerDec.RequestParams('Number', 'num') num: number,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
         const response = new BaseResponse<Components[]>();
 
         try {
-            response._datas = await CodeControl.ComponentsServices.getAllComponents();
+            response._datas = await CodeControl.ComponentsServices.getAllComponents(num);
 
             response.changeType(BackType.success);
         } catch (e) {

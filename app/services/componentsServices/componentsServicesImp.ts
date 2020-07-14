@@ -23,7 +23,7 @@ export interface ComponentsServicesImp {
     /**
      * 获取全部组件信息
      */
-    getAllComponents(): Promise<Components[]>;
+    getAllComponents(num: number): Promise<Components[]>;
 
     /**
      * 通过ids删除组件信息

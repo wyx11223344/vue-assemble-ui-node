@@ -10,11 +10,14 @@ export default class ComponentsMapper {
 
     /**
      * 获取全部npm包信息
+     * @param {Number} num 获取条数
      * @returns {Promise<NpmPublish[]>}
      */
-    static getAllComponents(): Promise<Components[]> {
+    static getAllComponents(num?: number): Promise<Components[]> {
+        let limit = '';
+        if (num) {limit = `limit 0,${num}`;}
         return new Promise((resolve, reject) => {
-            MySql.query('select * from components')
+            MySql.query('select * from components where id != 1 ' + limit)
                 .then((results: Components[]) => {
                     resolve(results);
                 })

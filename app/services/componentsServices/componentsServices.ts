@@ -37,11 +37,12 @@ export default class ComponentsServices implements ComponentsServicesImp {
 
     /**
      * 获取全部组件信息
+     * @param {Number} num 获取条数
      * @returns {Promise<Components[]>}
      */
-    @RedisDec.Cacheable('Components')
-    getAllComponents(): Promise<Components[]> {
-        return ComponentsMapper.getAllComponents();
+    @RedisDec.Cacheable('Components', '#num')
+    getAllComponents(num?: number): Promise<Components[]> {
+        return ComponentsMapper.getAllComponents(num);
     }
 
     /**
