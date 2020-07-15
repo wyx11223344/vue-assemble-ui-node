@@ -13,8 +13,6 @@ import CodeServices from '../../services/codeServices/codeServices';
 import {BackComponents, HtmlObj} from '../../types/codes';
 import Components from '../../models/components';
 import {BaseErrorMsg} from '../../types/baseBackMsg';
-import MyRedis from '../../cache';
-import RandomWord from '../../utils/randomWord';
 import ComponentsClassify from '../../models/componentsClassify';
 const routerDec: RouterDec = new RouterDec();
 
