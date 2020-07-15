@@ -4,6 +4,7 @@
  * @Description: 组件操作接口定义
 */
 import Components from '../../models/components';
+import {BackComponents} from '../../types/codes';
 
 export interface ComponentsServicesImp {
 
@@ -30,4 +31,10 @@ export interface ComponentsServicesImp {
      * @param {string} Ids ,拼接ids
      */
     removeComponentsByIds(Ids: string): Promise<boolean>;
+
+    /**
+     * 为组件添加html获取缓存id
+     * @param {BackComponents[]} findComponents 需要添加的组件对象
+     */
+    dealComponentsAddHtml(findComponents: BackComponents[]): Promise<void>;
 }

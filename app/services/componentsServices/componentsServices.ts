@@ -7,8 +7,14 @@ import {ComponentsServicesImp} from './componentsServicesImp';
 import RedisDec from '../../decorators/redisDec';
 import Components from '../../models/components';
 import ComponentsMapper from '../../mapper/componentsMapper';
+import {BackComponents} from '../../types/codes';
+import Codes from '../../models/codes';
+import RandomWord from '../../utils/randomWord';
+import MyRedis from '../../cache';
+import CodeServices from '../codeServices/codeServices';
 
 export default class ComponentsServices implements ComponentsServicesImp {
+    private static CodeServices: CodeServices = new CodeServices()
 
     /**
      * 保存新组件返回id
@@ -73,6 +79,32 @@ export default class ComponentsServices implements ComponentsServicesImp {
                     }
                 }).catch((e) => {
                     reject(e);
+                });
+            });
+        });
+    }
+
+    /**
+     * 为组件添加html获取缓存id
+     * @param {BackComponents[]} findComponents 需要添加的组件对象
+     */
+    dealComponentsAddHtml(findComponents: BackComponents[]): Promise<void> {
+        return new Promise((resolve, reject) => {
+            let checkNum = 0;
+            findComponents.forEach((item: BackComponents) => {
+                ComponentsServices.CodeServices.getCodes(item.id).then((results: Codes[]) => {
+                    const getSign: string = RandomWord.getSign();
+                    item.htmlId = getSign;
+
+                    MyRedis.set(getSign, JSON.stringify(results));
+                    MyRedis.exp(getSign, 10);
+
+                    checkNum++;
+                    if (checkNum === findComponents.length) {
+                        resolve();
+                    }
+                }).catch(() => {
+                    reject();
                 });
             });
         });

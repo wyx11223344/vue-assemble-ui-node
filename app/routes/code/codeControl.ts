@@ -6,6 +6,7 @@
 import * as express from 'express';
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import ComponentsServices from '../../services/componentsServices/componentsServices';
+import ComponentsClassifySercives from '../../services/componentsClassifyServices/componentsClassifyServices';
 import BaseResponse, {BackType} from '../../models/baseResponse';
 import Codes from '../../models/codes';
 import CodeServices from '../../services/codeServices/codeServices';
@@ -14,12 +15,14 @@ import Components from '../../models/components';
 import {BaseErrorMsg} from '../../types/baseBackMsg';
 import MyRedis from '../../cache';
 import RandomWord from '../../utils/randomWord';
+import ComponentsClassify from '../../models/componentsClassify';
 const routerDec: RouterDec = new RouterDec();
 
 @routerDec.BaseRequest('/code/CodeControl')
 export class CodeControl {
     private static CodeServices: CodeServices = new CodeServices()
     private static ComponentsServices: ComponentsServices = new ComponentsServices()
+    private static ComponentsClassifySercives: ComponentsClassifySercives = new ComponentsClassifySercives()
 
     /**
      * 通过componentId获取代码模板
@@ -124,21 +127,25 @@ export class CodeControl {
 
     /**
      * 通过类别获取组件
-     * @route POST /code/CodeControl/getComponentsByClassify
+     * @route POST /code/CodeControl/getComponentsByClassifyWithHtml
      * @group 代码控制
      * @param {number} classify.formData.required 组件类别
      * @returns {Promise} 200 - 返回查询结果
      * @returns {Promise} 500 - 返回错误原因
      */
-    @routerDec.RequestMapping('/getComponentsByClassify', MyType.post)
-    async getComponentsByClassify(
+    @routerDec.RequestMapping('/getComponentsByClassifyWithHtml', MyType.post)
+    async getComponentsByClassifyWithHtml(
         @routerDec.RequestParams('String', 'classify') classify: number,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
         const response = new BaseResponse<Components[]>();
 
         try {
-            response._datas = await CodeControl.ComponentsServices.getComponentsByClassify(classify);
+            const findComponents: BackComponents[] = await CodeControl.ComponentsServices.getComponentsByClassify(classify);
+
+            await CodeControl.ComponentsServices.dealComponentsAddHtml(findComponents);
+
+            response._datas = findComponents;
 
             response.changeType(BackType.success);
         } catch (e) {
@@ -166,25 +173,7 @@ export class CodeControl {
         try {
             const findComponents: BackComponents[] = await CodeControl.ComponentsServices.getAllComponents(num);
 
-            await new Promise((resolve, reject) => {
-                let checkNum = 0;
-                findComponents.forEach((item: BackComponents) => {
-                    CodeControl.CodeServices.getCodes(item.id).then((results: Codes[]) => {
-                        const getSign: string = RandomWord.getSign();
-                        item.htmlId = getSign;
-
-                        MyRedis.set(getSign, JSON.stringify(results));
-                        MyRedis.exp(getSign, 10);
-
-                        checkNum++;
-                        if (checkNum === findComponents.length) {
-                            resolve();
-                        }
-                    }).catch(() => {
-                        reject();
-                    });
-                });
-            });
+            await CodeControl.ComponentsServices.dealComponentsAddHtml(findComponents);
 
             response._datas = findComponents;
             response.changeType(BackType.success);
@@ -270,6 +259,30 @@ export class CodeControl {
         }
 
         res.send(response);
+    }
+
+    /**
+     * 获取全部组件
+     * @route POST /code/CodeControl/getAllClassify
+     * @group 代码控制
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
+     */
+    @routerDec.RequestMapping('/getAllClassify', MyType.post)
+    async getAllClassify(
+        @routerDec.Response() res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<ComponentsClassify[]>();
+
+        try {
+            response._datas = await CodeControl.ComponentsClassifySercives.getAllClassify();
+
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = BaseErrorMsg.sqlError;
+        }
+
+        res.json(response);
     }
 
 }

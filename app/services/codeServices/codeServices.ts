@@ -70,7 +70,7 @@ export default class CodeServices implements CodeSercicesImp{
                 if (r.fieldCount > 0) {
                     checkStatus = false;
                 }
-                if (Codes.length >= checkNum) {
+                if (checkNum >= Codes.length) {
                     resolve(checkStatus);
                 }
             };
