@@ -35,7 +35,7 @@ export default class RedisDec {
                     params.split('#').forEach((item) => {
                         const index = getParams.indexOf(item);
                         if (args[index]) {
-                            reqParams += item + '-' + (typeof args[index] === 'object' ? JSON.stringify(args[index]) : args[index]) + '&';
+                            reqParams += item + '-' + (typeof args[index] === 'object' ? JSON.stringify(args[index]).replace(/:/g, '') : args[index]) + '&';
                         }
                     });
                 } else {
