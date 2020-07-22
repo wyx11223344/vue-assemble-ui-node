@@ -123,38 +123,40 @@ export class CodeControl {
     //     res.json(response);
     // }
 
+    // /**
+    //  * 通过类别获取组件
+    //  * @route POST /code/CodeControl/getComponentsByClassifyWithHtml
+    //  * @group 代码控制
+    //  * @param {number} classify.formData.required 组件类别
+    //  * @returns {Promise} 200 - 返回查询结果
+    //  * @returns {Promise} 500 - 返回错误原因
+    //  */
+    // @routerDec.RequestMapping('/getComponentsByClassifyWithHtml', MyType.post)
+    // async getComponentsByClassifyWithHtml(
+    //     @routerDec.RequestParams('Number', 'page') page: number,
+    //     @routerDec.RequestParams('Number', 'pageSize') pageSize: number,
+    //     @routerDec.RequestParams('String', 'classify') classify: number,
+    //     @routerDec.Response() res: express.Response
+    // ): Promise<void> {
+    //     const response = new BaseResponse<Components[]>();
+    //
+    //     try {
+    //         const findComponents: BackComponents[] = await CodeControl.ComponentsServices.getComponentsByClassify(classify, page, pageSize);
+    //
+    //         await CodeControl.ComponentsServices.dealComponentsAddHtml(findComponents);
+    //
+    //         response._datas = findComponents;
+    //
+    //         response.changeType(BackType.success);
+    //     } catch (e) {
+    //         response._msg = BaseErrorMsg.sqlError;
+    //     }
+    //
+    //     res.json(response);
+    // }
+
     /**
-     * 通过类别获取组件
-     * @route POST /code/CodeControl/getComponentsByClassifyWithHtml
-     * @group 代码控制
-     * @param {number} classify.formData.required 组件类别
-     * @returns {Promise} 200 - 返回查询结果
-     * @returns {Promise} 500 - 返回错误原因
-     */
-    @routerDec.RequestMapping('/getComponentsByClassifyWithHtml', MyType.post)
-    async getComponentsByClassifyWithHtml(
-        @routerDec.RequestParams('String', 'classify') classify: number,
-        @routerDec.Response() res: express.Response
-    ): Promise<void> {
-        const response = new BaseResponse<Components[]>();
-
-        try {
-            const findComponents: BackComponents[] = await CodeControl.ComponentsServices.getComponentsByClassify(classify);
-
-            await CodeControl.ComponentsServices.dealComponentsAddHtml(findComponents);
-
-            response._datas = findComponents;
-
-            response.changeType(BackType.success);
-        } catch (e) {
-            response._msg = BaseErrorMsg.sqlError;
-        }
-
-        res.json(response);
-    }
-
-    /**
-     * 获取全部组件
+     * 根据条件获取组件
      * @route POST /code/CodeControl/getAllComponentsWithHtml
      * @group 代码控制
      * @param {number} num.formData 获取条数
@@ -163,15 +165,19 @@ export class CodeControl {
      */
     @routerDec.RequestMapping('/getAllComponentsWithHtml', MyType.post)
     async getAllComponentsWithHtml(
-        @routerDec.RequestParams('Number', 'num') num: number,
+        @routerDec.RequestParams('Number', 'page') page: number,
+        @routerDec.RequestParams('Number', 'pageSize') pageSize: number,
+        @routerDec.RequestParams('String', 'classify') classify: number,
+        @routerDec.RequestParams('String', 'name') name: string,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
-        const response = new BaseResponse<BackComponents[]>();
+        const response = new BaseResponse<{ list: BackComponents[]; total: number }>();
+        const newComponent = new Components(null, name, null, null, null, classify);
 
         try {
-            const findComponents: BackComponents[] = await CodeControl.ComponentsServices.getAllComponents(num);
+            const findComponents: { list: BackComponents[]; total: number } = await CodeControl.ComponentsServices.getAllComponents(newComponent, page, pageSize);
 
-            await CodeControl.ComponentsServices.dealComponentsAddHtml(findComponents);
+            await CodeControl.ComponentsServices.dealComponentsAddHtml(findComponents.list);
 
             response._datas = findComponents;
             response.changeType(BackType.success);
@@ -183,7 +189,7 @@ export class CodeControl {
     }
 
     /**
-     * 获取全部组件
+     * 根据条件获取组件
      * @route POST /code/CodeControl/getAllComponents
      * @group 代码控制
      * @param {number} num.formData 获取条数
@@ -192,13 +198,17 @@ export class CodeControl {
      */
     @routerDec.RequestMapping('/getAllComponents', MyType.post)
     async getAllComponents(
-        @routerDec.RequestParams('Number', 'num') num: number,
+        @routerDec.RequestParams('Number', 'page') page: number,
+        @routerDec.RequestParams('Number', 'pageSize') pageSize: number,
+        @routerDec.RequestParams('Number', 'classify') classify: number,
+        @routerDec.RequestParams('String', 'name') name: string,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
-        const response = new BaseResponse<Components[]>();
+        const response = new BaseResponse<{ list: Components[]; total: number }>();
+        const newComponent = new Components(null, name, null, null, null, classify);
 
         try {
-            response._datas = await CodeControl.ComponentsServices.getAllComponents(num);
+            response._datas = await CodeControl.ComponentsServices.getAllComponents(newComponent, page, pageSize);
 
             response.changeType(BackType.success);
         } catch (e) {

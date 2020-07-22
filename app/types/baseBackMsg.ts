@@ -19,6 +19,6 @@ export enum BaseErrorMsg {
 }
 
 export enum BaseSuccessMsg {
-    // npm包生成
-    saveNpm = '成功添加构成任务，构建状态和详情请查看'
+    // npm包保存
+    saveNpm = 'npm包保存成功'
 }

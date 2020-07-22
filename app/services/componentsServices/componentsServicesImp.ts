@@ -19,12 +19,12 @@ export interface ComponentsServicesImp {
      * 通过classify获取组件信息
      * @param {Number} classify 类别
      */
-    getComponentsByClassify(classify: number): Promise<Components[]>;
+    // getComponentsByClassify(classify: number, page: number, pageSize: number): Promise<Components[]>;
 
     /**
      * 获取全部组件信息
      */
-    getAllComponents(num: number): Promise<Components[]>;
+    getAllComponents(component: Components, page: number, pageSize: number): Promise<{ list: Components[]; total: number }>;
 
     /**
      * 通过ids删除组件信息

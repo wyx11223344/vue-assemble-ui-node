@@ -10,14 +10,20 @@ export default class ComponentsMapper {
 
     /**
      * 获取全部npm包信息
-     * @param {Number} num 获取条数
+     * @param {Number} pageSize 获取条数
      * @returns {Promise<NpmPublish[]>}
      */
-    static getAllComponents(num?: number): Promise<Components[]> {
-        let limit = '';
-        if (num) {limit = `limit 0,${num}`;}
-        return new Promise((resolve, reject) => {
-            MySql.query('select * from components where id != 1 ' + limit)
+    static async getAllComponents(component: Components, page = 1, pageSize = 10): Promise<{ list: Components[]; total: number }> {
+        const limit = ` limit ${(page - 1) * pageSize},${pageSize}`;
+        let where = '';
+        Object.keys(component).filter((item: string) => item !== '_id').forEach((item) => {
+            const key = item.replace('_', '');
+            if (component[key]) {
+                where += ` and a.${key} = '${component[item]}'`;
+            }
+        });
+        const list: Components[] = await new Promise((resolve, reject) => {
+            MySql.query('select a.id, a.name, a.classify, a.type, a.status, b.name as showname from components a LEFT JOIN users b ON a.usersId = b.id where a.id != 1 ' + where + limit)
                 .then((results: Components[]) => {
                     resolve(results);
                 })
@@ -25,6 +31,17 @@ export default class ComponentsMapper {
                     reject(e);
                 });
         });
+        const total: {total: number} = await new Promise((resolve, reject) => {
+            MySql.query('select count(*) as total from components a where a.id != 1 ' + where)
+                .then((results: [{ total: number }]) => {
+                    resolve(results[0]);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+
+        return {list: list, total: total.total};
     }
 
     /**
@@ -32,17 +49,19 @@ export default class ComponentsMapper {
      * @param {Number} classify 组件类型
      * @returns {Promise<Components[]>}
      */
-    static getComponentsByClassify(classify: number): Promise<Components[]> {
-        return new Promise((resolve, reject) => {
-            MySql.query('select * from components where classify = ' + classify)
-                .then((results: Components[]) => {
-                    resolve(results);
-                })
-                .catch((e) => {
-                    reject(e);
-                });
-        });
-    }
+    // static getComponentsByClassify(classify: number, page = 1, pageSize = 10): Promise<Components[]> {
+    //     return new Promise((resolve, reject) => {
+    //         const limit = `limit ${(page - 1) * pageSize},${page * pageSize}`;
+    //         console.log(limit);
+    //         MySql.query('select * from components where classify = ' + classify + limit)
+    //             .then((results: Components[]) => {
+    //                 resolve(results);
+    //             })
+    //             .catch((e) => {
+    //                 reject(e);
+    //             });
+    //     });
+    // }
 
     /**
      * 通过id删除组件

@@ -5,7 +5,6 @@
 */
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import * as express from 'express';
-import Codes from '../../models/codes';
 import CodeServices from '../../services/codeServices/codeServices';
 import PublishPackageServices from '../../services/packageServices/npmPackageServices/publishPackageServices';
 import PackageServices from '../../services/packageServices/packageServices';
@@ -24,15 +23,15 @@ export class NpmPackage {
     /**
      * 创建新的npm包
      * @group npm包管理
-     * @route POST /package/npmPackage/createNewNpm
+     * @route POST /package/npmPackage/setNpm
      * @param {number} id.formData npm包的id
      * @param {string} componentsId.formData.required 以,分割的组件ids
      * @param {string} name.formData.required 发布包名称
      * @param {string} version.formData.required 版本号
      * @returns {Promise} 200 - 返回true
      */
-    @routerDec.RequestMapping('/createNewNpm', MyType.post)
-    async createNewNpm(
+    @routerDec.RequestMapping('/setNpm', MyType.post)
+    async setNpm(
         @routerDec.RequestParams('Number', 'id') id: number,
         @routerDec.RequestParams('String', 'componentsId') componentsId: string,
         @routerDec.RequestParams('String', 'name') name: string,
@@ -52,14 +51,14 @@ export class NpmPackage {
                 throw BaseErrorMsg.sqlError;
             }
 
-            const componentIds: number[] = componentsId.split(',').map((item: string) => Number(item));
-
-            // 获取代码数组
-            const ComponentsCodes: {[a: string]: Codes[]} = await NpmPackage.CodeServices.getCodesByIds(componentIds);
-
-            if (!await NpmPackage.PublishPackageServices.addNewPackage(name, ComponentsCodes, version)) {
-                throw BaseErrorMsg.redisError;
-            }
+            // const componentIds: number[] = componentsId.split(',').map((item: string) => Number(item));
+            //
+            // // 获取代码数组
+            // const ComponentsCodes: {[a: string]: Codes[]} = await NpmPackage.CodeServices.getCodesByIds(componentIds);
+            //
+            // if (!await NpmPackage.PublishPackageServices.addNewPackage(name, ComponentsCodes, version)) {
+            //     throw BaseErrorMsg.redisError;
+            // }
 
             response.changeType(BackType.success);
             response._msg = BaseSuccessMsg.saveNpm;

@@ -23,7 +23,7 @@ export default class ComponentsServices implements ComponentsServicesImp {
      * @returns {Promise<number>} 返回id
      */
     @RedisDec.CacheEvict('Components', 'getAllComponents')
-    @RedisDec.CacheEvict('Components', 'getComponentsByClassify', '#classify')
+    // @RedisDec.CacheEvict('Components', 'getComponentsByClassify', '#classify')
     setComponent(components: Components, classify?: number): Promise<number> {
         if (components.id) {
             return ComponentsMapper.updateComponents(components).then((r) => r.insertId);
@@ -32,23 +32,23 @@ export default class ComponentsServices implements ComponentsServicesImp {
         }
     }
 
-    /**
-     * 通过classify获取组件信息
-     * @param {Number} classify 类别
-     */
-    @RedisDec.Cacheable('Components', '#classify')
-    getComponentsByClassify(classify: number): Promise<Components[]> {
-        return ComponentsMapper.getComponentsByClassify(classify);
-    }
+    // /**
+    //  * 通过classify获取组件信息
+    //  * @param {Number} classify 类别
+    //  */
+    // @RedisDec.Cacheable('Components', '#classify#page#pageSize')
+    // getComponentsByClassify(classify: number, page: number, pageSize: number): Promise<Components[]> {
+    //     return ComponentsMapper.getComponentsByClassify(classify, page, pageSize);
+    // }
 
     /**
      * 获取全部组件信息
      * @param {Number} num 获取条数
      * @returns {Promise<Components[]>}
      */
-    @RedisDec.Cacheable('Components', '#num')
-    getAllComponents(num?: number): Promise<Components[]> {
-        return ComponentsMapper.getAllComponents(num);
+    @RedisDec.Cacheable('Components', '#component#page#pageSize')
+    getAllComponents(component: Components, page: number, pageSize: number): Promise<{ list: Components[]; total: number }> {
+        return ComponentsMapper.getAllComponents(component, page, pageSize);
     }
 
     /**
@@ -90,6 +90,7 @@ export default class ComponentsServices implements ComponentsServicesImp {
      */
     dealComponentsAddHtml(findComponents: BackComponents[]): Promise<void> {
         return new Promise((resolve, reject) => {
+            if (findComponents.length <= 0) {resolve();}
             let checkNum = 0;
             findComponents.forEach((item: BackComponents) => {
                 ComponentsServices.CodeServices.getCodes(item.id).then((results: Codes[]) => {

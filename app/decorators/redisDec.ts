@@ -35,7 +35,7 @@ export default class RedisDec {
                     params.split('#').forEach((item) => {
                         const index = getParams.indexOf(item);
                         if (args[index]) {
-                            reqParams += item + '-' + String(args[index]) + '&';
+                            reqParams += item + '-' + (typeof args[index] === 'object' ? JSON.stringify(args[index]) : args[index]) + '&';
                         }
                     });
                 } else {
@@ -161,7 +161,7 @@ export default class RedisDec {
     private static getFunParams(fn: Function): string[] {
         const regex1 = /\((.*?)\)/; // () 小括号
         const getList = fn.toString().match(regex1);
-        const dealString = getList[1].replace(' ', '');
+        const dealString = getList[1].replace(/ /g, '');
         return dealString.split(',');
     }
 }
