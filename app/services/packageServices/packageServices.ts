@@ -107,6 +107,8 @@ export default class PackageServices implements PackageServicesImp{
             if (npmId) {
                 const npmObj: NpmPublish = (await PackageServices.getNpmById(npmId))[0];
 
+                PackageServices.clearGetNpmByIdRedis(npmId);
+
                 // 判断版本信息问题
                 if (npmObj && npmObj.version >= npmPublish.version) {
                     resolve(false);
@@ -119,6 +121,11 @@ export default class PackageServices implements PackageServicesImp{
                 resolve(true);
             }
         });
+    }
+
+    @RedisDec.CacheEvict('NpmPublish', 'getNpmById', '#npmId')
+    private static clearGetNpmByIdRedis(npmId: number) {
+        return true;
     }
 
     /**
