@@ -74,7 +74,7 @@ export class CodeControl {
             response._msg = BaseErrorMsg.paramsError;
         } else {
             try {
-                const componentId: number = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null, classify), classify);
+                const componentId: number = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null, classify), id);
 
                 if (getHtml.length > 0) {
                     const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId, item.type));
@@ -209,6 +209,36 @@ export class CodeControl {
 
         try {
             response._datas = await CodeControl.ComponentsServices.getAllComponents(newComponent, page, pageSize);
+
+            response.changeType(BackType.success);
+        } catch (e) {
+            response._msg = BaseErrorMsg.sqlError;
+        }
+
+        res.json(response);
+    }
+
+    /**
+     * 根据组件ids获取组件信息
+     * @route POST /code/CodeControl/getComponentsByIds
+     * @group 代码控制
+     * @param {string} ids.formData.require 获取条数
+     * @returns {Promise} 200 - 返回查询结果
+     * @returns {Promise} 500 - 返回错误原因
+     */
+    @routerDec.RequestMapping('/getComponentsByIds', MyType.post)
+    async getComponentsByIds(
+        @routerDec.RequestParams('String', 'ids') ids: string,
+        @routerDec.Response() res: express.Response
+    ): Promise<void> {
+        const response = new BaseResponse<BackComponents[]>();
+
+        try {
+            const findComponents: BackComponents[] = await CodeControl.ComponentsServices.getComponentsByIds(ids);
+
+            await CodeControl.ComponentsServices.dealComponentsAddHtml(findComponents);
+
+            response._datas = findComponents;
 
             response.changeType(BackType.success);
         } catch (e) {

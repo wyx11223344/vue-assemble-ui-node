@@ -19,9 +19,14 @@ export default class ComponentsMapper {
         Object.keys(component).filter((item: string) => item !== '_id').forEach((item) => {
             const key = item.replace('_', '');
             if (component[key]) {
-                where += ` and a.${key} = '${component[item]}'`;
+                if (key === 'name'){
+                    where += ` and a.${key} like '%${component[item]}%'`;
+                } else {
+                    where += ` and a.${key} = '${component[item]}'`;
+                }
             }
         });
+
         const list: Components[] = await new Promise((resolve, reject) => {
             MySql.query('select a.id, a.name, a.classify, a.type, a.status, b.name as showname from components a LEFT JOIN users b ON a.usersId = b.id where a.id != 1 ' + where + limit)
                 .then((results: Components[]) => {
@@ -62,6 +67,24 @@ export default class ComponentsMapper {
     //             });
     //     });
     // }
+
+    /**
+     * 通过id获取组件信息
+     * @param {Number} Id 组件类型
+     * @returns {Promise<Components[]>}
+     */
+    static getComponentById(Id: number): Promise<Components[]> {
+        return new Promise((resolve, reject) => {
+            MySql.query('select * from components where id = ' + Id)
+                .then((results: Components[]) => {
+                    console.log(results);
+                    resolve(results);
+                })
+                .catch((e) => {
+                    reject(e);
+                });
+        });
+    }
 
     /**
      * 通过id删除组件

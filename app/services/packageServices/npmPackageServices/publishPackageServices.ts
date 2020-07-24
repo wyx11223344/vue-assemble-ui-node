@@ -27,7 +27,7 @@ export default class PublishPackageServices implements PublishPackageServicesImp
      */
     async removePackage(npmName: string): Promise<boolean> {
         return await new Promise((resolve) => {
-            exec(`npm unpublish @wyx962717593/${npmName}`, (error, stdout, stderr) => {
+            exec(`npm unpublish @wyx962717593/${npmName} --force`, (error, stdout, stderr) => {
                 if (error) {
                     resolve(false);
                 } else {
@@ -243,7 +243,7 @@ export default {
 
             // 创建基础项目
             await this.checkPathExist(dealObject.path);
-            await this.downLoadGitTemplate('direct:https://gitee.com/missshen/vue-assemble-ui-package', dealObject.path);
+            await this.downLoadGitTemplate('direct:https://gitee.com/beon/vue-assemble-ui-package', dealObject.path);
 
             // 执行构建项目,更新入口index
             await this.createPackageByObject(dealObject.path, dealObject.componentsObj);

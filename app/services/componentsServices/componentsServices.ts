@@ -23,8 +23,8 @@ export default class ComponentsServices implements ComponentsServicesImp {
      * @returns {Promise<number>} 返回id
      */
     @RedisDec.CacheEvict('Components', 'getAllComponents')
-    // @RedisDec.CacheEvict('Components', 'getComponentsByClassify', '#classify')
-    setComponent(components: Components, classify?: number): Promise<number> {
+    @RedisDec.CacheEvict('Components', 'getComponentsById', '#Id')
+    setComponent(components: Components, Id?: number): Promise<number> {
         if (components.id) {
             return ComponentsMapper.updateComponents(components).then((r) => r.insertId);
         } else {
@@ -57,6 +57,7 @@ export default class ComponentsServices implements ComponentsServicesImp {
      * @returns {Promise<boolean>}
      */
     @RedisDec.CacheEvict('Components', 'getAllComponents')
+    @RedisDec.CacheEvict('Components', 'getComponentsById', '#Id')
     private static removeComponentsById(Id: number): Promise<boolean> {
         return ComponentsMapper.removeComponentById(Id);
     }
@@ -74,6 +75,40 @@ export default class ComponentsServices implements ComponentsServicesImp {
                 ComponentsServices.removeComponentsById(Number(item)).then((results: boolean) => {
                     if (!results) {checkStatus = false;}
                     checkNum++;
+                    if (checkNum >= Ids.split(',').length) {
+                        resolve(checkStatus);
+                    }
+                }).catch((e) => {
+                    reject(e);
+                });
+            });
+        });
+    }
+
+    /**
+     * 通过id获得组件信息
+     * @param {Number} Id 组件id
+     * @returns {Promise<boolean>}
+     */
+    @RedisDec.Cacheable('Components', '#Id')
+    private static getComponentsById(Id: number): Promise<Components[]> {
+        return ComponentsMapper.getComponentById(Id);
+    }
+
+    /**
+     * 通过ids获取多个组件
+     * @param {String} Ids ids字符串
+     * @returns {Promise<boolean>}
+     */
+    getComponentsByIds(Ids: string): Promise<Components[]> {
+        let checkNum = 0;
+        let checkStatus = [];
+        return new Promise((resolve, reject) => {
+            Ids.split(',').forEach((item: string) => {
+                ComponentsServices.getComponentsById(Number(item)).then((results: Components[]) => {
+                    if (!results) {reject();}
+                    checkNum++;
+                    checkStatus.push(...results);
                     if (checkNum >= Ids.split(',').length) {
                         resolve(checkStatus);
                     }

@@ -86,8 +86,8 @@ export default class NpmPublishMapper {
         return new Promise((resolve, reject) => {
             MySql.queryArgs('INSERT INTO npmPublish (name, componentsIds, version) VALUES (?, ?, ?)', [
                 npmPublish.name,
-                npmPublish.componentsIds,
-                npmPublish.version
+                '',
+                ''
             ])
                 .then((results: any) => {
                     resolve(results);
@@ -107,7 +107,7 @@ export default class NpmPublishMapper {
         let sets = '';
         Object.keys(npmPublish).filter((item: string) => item !== 'id').forEach((item: string) => {
             const key = item.replace('_', '');
-            if (npmPublish[key]) {
+            if (npmPublish[key] !== undefined) {
                 sets += sets ? `, ${key} = '${npmPublish[item]}'` : `set ${key} = '${npmPublish[item]}'`;
             }
         });

@@ -13,7 +13,7 @@ export interface ComponentsServicesImp {
      * @param {Number} classify 组件类型
      * @param {Components} components 新组件名称
      */
-    setComponent(components: Components, classify?: number): Promise<number>;
+    setComponent(components: Components, Id?: number): Promise<number>;
 
     /**
      * 通过classify获取组件信息
@@ -37,4 +37,10 @@ export interface ComponentsServicesImp {
      * @param {BackComponents[]} findComponents 需要添加的组件对象
      */
     dealComponentsAddHtml(findComponents: BackComponents[]): Promise<void>;
+
+    /**
+     * 通过ids获取组件信息
+     * @param Ids
+     */
+    getComponentsByIds(Ids: string): Promise<Components[]>;
 }

@@ -18,7 +18,7 @@ export default class PackageServices implements PackageServicesImp{
      * @returns {Promise<any>}
      */
     @RedisDec.Cacheable('NpmPublish', '#npmId')
-    private static async getNpmById(npmId: number): Promise<NpmPublish> {
+    private static async getNpmById(npmId: number): Promise<NpmPublish[]> {
         return NpmPublishMapper.getNpmById(npmId);
     }
 
@@ -29,9 +29,9 @@ export default class PackageServices implements PackageServicesImp{
      */
     @RedisDec.CacheEvict('NpmPublish', 'getNpmById', '#npmId')
     private static async delectNpmById(npmId: number): Promise<boolean> {
-        const getNpm: NpmPublish = await PackageServices.getNpmById(npmId);
-        if (!await PackageServices.PublishPackageServices.removePackage(getNpm.name)) {
-            return false;
+        const getNpm: NpmPublish[] = await PackageServices.getNpmById(npmId);
+        if (!await PackageServices.PublishPackageServices.removePackage(getNpm[0].name)) {
+            return new Promise((resolve) => {resolve(false);});
         }
         return NpmPublishMapper.delectNpmById(npmId);
     }
@@ -41,21 +41,18 @@ export default class PackageServices implements PackageServicesImp{
      * @param {String} npmId npm包的id
      * @returns {Promise<any>}
      */
-    @RedisDec.Cacheable('NpmPublish', '#npmId')
+    @RedisDec.CacheEvict('NpmPublish', 'getAllNpm')
     async delectNpmByIds(npmIds: string): Promise<boolean> {
         let checkNum = 0;
         let checkStatus = true;
         return new Promise((resolve, reject) => {
             npmIds.split(',').forEach((item: string) => {
-                PackageServices.getNpmById(Number(item)).then((result: NpmPublish) => {
-                    PackageServices.delectNpmById(result.id).then((results: boolean) => {
-                        if (!results) {checkStatus = false;}
-                        if (checkNum >= npmIds.split(',').length) {
-                            resolve(checkStatus);
-                        }
-                    }).catch(() => {
-                        reject();
-                    });
+                PackageServices.delectNpmById(Number(item)).then((results: boolean) => {
+                    checkNum++;
+                    if (!results) {checkStatus = false;}
+                    if (checkNum >= npmIds.split(',').length) {
+                        resolve(checkStatus);
+                    }
                 }).catch(() => {
                     reject();
                 });
@@ -74,8 +71,8 @@ export default class PackageServices implements PackageServicesImp{
         return new Promise((resolve, reject) => {
             npmIds.split(',').forEach((item: string) => {
                 PackageServices.getNpmById(Number(item))
-                    .then((result: NpmPublish) => {
-                        backList.push(result);
+                    .then((result: NpmPublish[]) => {
+                        backList.push(...result);
                         checkNum++;
                         if (checkNum >= npmIds.split(',').length) {
                             resolve(backList);
@@ -108,7 +105,7 @@ export default class PackageServices implements PackageServicesImp{
     async setNpm(npmPublish: NpmPublish, npmId?: number): Promise<boolean> {
         return new Promise(async (resolve) => {
             if (npmId) {
-                const npmObj: NpmPublish = await PackageServices.getNpmById(npmId);
+                const npmObj: NpmPublish = (await PackageServices.getNpmById(npmId))[0];
 
                 // 判断版本信息问题
                 if (npmObj && npmObj.version >= npmPublish.version) {
