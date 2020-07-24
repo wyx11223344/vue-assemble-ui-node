@@ -77,7 +77,6 @@ export default class ComponentsMapper {
         return new Promise((resolve, reject) => {
             MySql.query('select * from components where id = ' + Id)
                 .then((results: Components[]) => {
-                    console.log(results);
                     resolve(results);
                 })
                 .catch((e) => {

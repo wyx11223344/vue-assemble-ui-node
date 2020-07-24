@@ -79,10 +79,15 @@ export class NpmPackage {
         try {
             const npmPublish: NpmPublish[] = await NpmPackage.PackageServices.getNpmByIds(id);
 
-            console.log(npmPublish);
-
             for (let i = 0; i < npmPublish.length ; i++) {
                 const item: NpmPublish = npmPublish[i];
+
+                item.version = version;
+
+                if (!await NpmPackage.PackageServices.setNpm(item, item.id)) {
+                    throw BaseErrorMsg.sqlError;
+                }
+
                 const componentIds: number[] = item.componentsIds.split(',').map((item: string) => Number(item));
 
                 // 获取代码数组
@@ -90,12 +95,6 @@ export class NpmPackage {
 
                 if (!await NpmPackage.PublishPackageServices.addNewPackage(item.name, ComponentsCodes, version)) {
                     throw BaseErrorMsg.redisError;
-                }
-
-                item.version = version;
-
-                if (!await NpmPackage.PackageServices.setNpm(item, item.id)) {
-                    throw BaseErrorMsg.sqlError;
                 }
             }
 
