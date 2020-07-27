@@ -28,7 +28,7 @@ export default class ComponentsMapper {
         });
 
         const list: Components[] = await new Promise((resolve, reject) => {
-            MySql.query('select a.id, a.name, a.classify, a.type, a.status, b.name as showname from components a LEFT JOIN users b ON a.usersId = b.id where a.id != 1 ' + where + limit + 'order by a.id desc;')
+            MySql.query('select a.id, a.name, a.classify, a.type, a.status, b.name as showname from components a LEFT JOIN users b ON a.usersId = b.id where a.id != 1 ' + where + 'order by a.id desc' + limit)
                 .then((results: Components[]) => {
                     resolve(results);
                 })
