@@ -4,7 +4,6 @@
  * @Description: 代码操作接口
 */
 import * as express from 'express';
-import TemplateHTML from '../../template/defaultIframe';
 import {MyType, RouterDec} from '../../decorators/routerDec';
 import MyRedis from '../../cache';
 import CodeOnlineServices from '../../services/codeServices/codeOnlineServices/codeOnlineServices';
@@ -66,9 +65,7 @@ export class CodeOnline {
             const a: string = await MyRedis.get(findId);
             const backHtml = await CodeOnline.CodeOnlineServices.dealVueOnlineCode(a);
 
-            res.write(TemplateHTML.startHTML);
-            res.write(backHtml);
-            res.end(TemplateHTML.endHTML);
+            res.end(backHtml);
         } catch (e) {
             next(e);
         }

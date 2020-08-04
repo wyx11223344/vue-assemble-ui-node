@@ -10,15 +10,25 @@ export default class Components{
     private _usersId: number;
     private _status: number;
     private _classify: number;
+    private _threePacks: string;
 
-    constructor(id: number, name: string, type: number, usersId: number, status: number, classify?: number) {
+    constructor(id: number, name: string, type: number, usersId: number, status: number, classify: number, threePacks?: string) {
         this._id = id;
         this._name = name;
         this._type = type;
         this._usersId = usersId;
         this._status = status;
         this._classify = classify;
+        this._threePacks = threePacks;
     }
+    get threePacks(): string {
+        return this._threePacks;
+    }
+
+    set threePacks(value: string) {
+        this._threePacks = value;
+    }
+
 
     get id(): number {
         return this._id;

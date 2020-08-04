@@ -48,11 +48,10 @@ export default class MyRouter {
                         import(`.${routeUrl}/${file.split('.')[0]}`)
                             .then((route) => {
                                 route = route.default.router;
-                                this.router.use(`/`, route);
+                                this.router.use('/', route);
                             })
                             .catch((e) => {
                                 console.log(e);
-                                throw Error('读取路由文件失败，请检查');
                             });
                     }
                 }

@@ -5,8 +5,11 @@
 */
 import {CodeOnlineServicesImp} from './codeOnlineServicesImp';
 import * as less from 'less';
-import {HtmlObj} from '../../../types/codes';
+import {HtmlObj, OnCodeObj} from '../../../types/codes';
 import {BaseErrorMsg} from '../../../types/baseBackMsg';
+import ThreePacksServices from '../../threePacksServices/threePacksServices';
+import ThreePacks from '../../../models/threePacks';
+import TemplateHTML from '../../../template/defaultIframe';
 
 interface LessRender {
     css: string;
@@ -14,6 +17,7 @@ interface LessRender {
 }
 
 export default class CodeOnlineServices implements CodeOnlineServicesImp{
+    private static ThreePacksServices: ThreePacksServices = new ThreePacksServices()
 
     /**
      * 处理vue代码在线显示
@@ -23,10 +27,12 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
     async dealVueOnlineCode(a: string): Promise<string> {
         let backString = '';
         let aList: HtmlObj[] | undefined;
+        let CodeObj: OnCodeObj | undefined;
 
         if (a) {
             try {
-                aList = JSON.parse(a);
+                CodeObj = JSON.parse(a);
+                aList = CodeObj.codes;
             } catch (e) {
                 return BaseErrorMsg.jsonError;
             }
@@ -67,6 +73,16 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
 
             const backJs: string = CodeOnlineServices.createJs(baseObje, listObj);
             backString = `${template}\n${backJs}\n<style>\n${cssStyle}</style>\n`;
+
+            backString = TemplateHTML.startHTML + backString + TemplateHTML.endHTML;
+
+            if (CodeObj.threePacks && backString) {
+                const threePacks: ThreePacks[] = await CodeOnlineServices.ThreePacksServices.getThreePacksByIds(CodeObj.threePacks);
+                const threePackScript = threePacks.reduce((all: string, item: ThreePacks) => all + `<script src="${item.url}"></script>\n`, '');
+                const threePackUse = threePacks.reduce((all: string, item: ThreePacks) => all + `${item.code}\n`, '');
+
+                backString = backString.replace(/<!--threePacksScriptSet-->\n/, threePackScript).replace('//threePacksUseSet', threePackUse);
+            }
         }
 
         return backString;

@@ -28,7 +28,7 @@ export default class ComponentsMapper {
         });
 
         const list: Components[] = await new Promise((resolve, reject) => {
-            MySql.query('select a.id, a.name, a.classify, a.type, a.status, b.name as showname from components a LEFT JOIN users b ON a.usersId = b.id where a.id != 1 ' + where + 'order by a.id desc' + limit)
+            MySql.query('select a.id, a.name, a.classify, a.type, a.status, a.threePacks, b.name as showname from components a LEFT JOIN users b ON a.usersId = b.id where a.id != 1 ' + where + 'order by a.id desc' + limit)
                 .then((results: Components[]) => {
                     resolve(results);
                 })
@@ -109,8 +109,13 @@ export default class ComponentsMapper {
      */
     static setNewComponents(components: Components): Promise<any> {
         return new Promise((resolve, reject) => {
-            MySql.queryArgs('INSERT INTO components (name) VALUES (?)', [
-                components.name
+            MySql.queryArgs('INSERT INTO components (name, classify, type, usersId, status, threePacks) VALUES (?, ?, ?, ?, ?, ?)', [
+                components.name,
+                components.classify,
+                components.type,
+                components.usersId,
+                components.status,
+                components.threePacks
             ])
                 .then((results: any) => {
                     resolve(results);
@@ -130,7 +135,7 @@ export default class ComponentsMapper {
         let sets = '';
         Object.keys(components).filter((item: string) => item !== '_id').forEach((item) => {
             const key = item.replace('_', '');
-            if (components[key]) {
+            if (components[key] !== undefined) {
                 sets += sets ? `, ${key} = '${components[item]}'` : `set ${key} = '${components[item]}'`;
             }
         });

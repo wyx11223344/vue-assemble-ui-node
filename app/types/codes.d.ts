@@ -4,7 +4,6 @@
  * @Description: 前端传递codes对象定义
 */
 import Components from '../models/components';
-import Codes from '../models/codes';
 
 export interface HtmlObj {
     id?: number;
@@ -12,6 +11,11 @@ export interface HtmlObj {
     html: string;
     componentId?: number;
     type?: number;
+}
+
+export interface OnCodeObj{
+    codes: HtmlObj[];
+    threePacks: string;
 }
 
 export interface BackComponents extends Components{

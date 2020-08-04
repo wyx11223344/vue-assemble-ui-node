@@ -245,7 +245,7 @@ module.exports = {
         // 要求方法链中每个调用都有一个换行符
         "newline-per-chained-call": 0,
         // 不允许空格和 tab 混合缩进
-        "no-mixed-spaces-and-tabs": 2,
+        "no-mixed-spaces-and-tabs": 0,
         // 不允许多个空行
         "no-multiple-empty-lines": [
             2,

@@ -132,7 +132,7 @@ export default class ComponentsServices implements ComponentsServicesImp {
                     const getSign: string = RandomWord.getSign();
                     item.htmlId = getSign;
 
-                    MyRedis.set(getSign, JSON.stringify(results));
+                    MyRedis.set(getSign, JSON.stringify({codes: results, threePacks: item.threePacks}));
                     MyRedis.exp(getSign, 10);
 
                     checkNum++;

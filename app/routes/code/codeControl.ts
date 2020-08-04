@@ -64,7 +64,8 @@ export class CodeControl {
         @routerDec.RequestParams('String', 'name') name: string,
         @routerDec.RequestParams('Number', 'id') id: number,
         @routerDec.RequestParams('String', 'sendHtml') sendHtml: string,
-        @routerDec.RequestParams('String', 'classify') classify: number,
+        @routerDec.RequestParams('Number', 'classify') classify: number,
+        @routerDec.RequestParams('String', 'threePacks') threePacks: string,
         @routerDec.Response() res: express.Response
     ): Promise<void> {
         const getHtml: HtmlObj[] = JSON.parse(sendHtml ? sendHtml : '[]');
@@ -74,7 +75,7 @@ export class CodeControl {
             response._msg = BaseErrorMsg.paramsError;
         } else {
             try {
-                const componentId: number = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null, classify), id);
+                const componentId: number = await CodeControl.ComponentsServices.setComponent(new Components(id, name, null, null, null, classify, threePacks), id);
 
                 if (getHtml.length > 0) {
                     const codes = getHtml.map((item: HtmlObj) => new Codes(item.id, item.name, item.html, componentId, item.type));
