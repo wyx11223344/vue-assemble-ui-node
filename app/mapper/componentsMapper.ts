@@ -135,7 +135,7 @@ export default class ComponentsMapper {
         let sets = '';
         Object.keys(components).filter((item: string) => item !== '_id').forEach((item) => {
             const key = item.replace('_', '');
-            if (components[key] !== undefined) {
+            if (components[key] !== undefined && components[key] !== null) {
                 sets += sets ? `, ${key} = '${components[item]}'` : `set ${key} = '${components[item]}'`;
             }
         });

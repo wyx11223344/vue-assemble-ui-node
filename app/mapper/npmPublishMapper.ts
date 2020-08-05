@@ -107,7 +107,7 @@ export default class NpmPublishMapper {
         let sets = '';
         Object.keys(npmPublish).filter((item: string) => item !== 'id').forEach((item: string) => {
             const key = item.replace('_', '');
-            if (npmPublish[key] !== undefined) {
+            if (npmPublish[key] !== undefined && npmPublish[key] !== null) {
                 sets += sets ? `, ${key} = '${npmPublish[item]}'` : `set ${key} = '${npmPublish[item]}'`;
             }
         });

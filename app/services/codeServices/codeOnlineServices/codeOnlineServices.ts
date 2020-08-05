@@ -78,7 +78,7 @@ export default class CodeOnlineServices implements CodeOnlineServicesImp{
 
             if (CodeObj.threePacks && backString) {
                 const threePacks: ThreePacks[] = await CodeOnlineServices.ThreePacksServices.getThreePacksByIds(CodeObj.threePacks);
-                const threePackScript = threePacks.reduce((all: string, item: ThreePacks) => all + `<script src="${item.url}"></script>\n`, '');
+                const threePackScript = threePacks.reduce((all: string, item: ThreePacks) => all + `${item.url}\n`, '');
                 const threePackUse = threePacks.reduce((all: string, item: ThreePacks) => all + `${item.code}\n`, '');
 
                 backString = backString.replace(/<!--threePacksScriptSet-->\n/, threePackScript).replace('//threePacksUseSet', threePackUse);

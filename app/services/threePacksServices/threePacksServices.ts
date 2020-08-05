@@ -54,4 +54,20 @@ export default class ThreePacksServices implements ThreePacksServicesImp{
 	    });
 	}
 
+	/**
+	 * 保存第三方包
+	 * @param {ThreePacks} threePacks 第三方包对象
+	 * @param {Number} Id 第三方包id用作清除缓存
+	 * @returns {Promise<number>}
+	 */
+	@RedisDec.CacheEvict('threePacks', 'getThreePacks')
+	@RedisDec.CacheEvict('threePacks', 'getThreePacksById', '#Id')
+	savePacks(threePacks: ThreePacks, Id: number): Promise<number> {
+	    if (Id) {
+	        return ThreePacksMapper.updateThreePack(threePacks).then(() => Id);
+	    } else {
+	        return ThreePacksMapper.setNewThreePack(threePacks).then((r) => r.insertId);
+	    }
+	}
+
 }

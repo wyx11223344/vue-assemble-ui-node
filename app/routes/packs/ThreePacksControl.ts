@@ -68,6 +68,39 @@ export class ThreePacksControl {
 	    res.json(response);
 	}
 
+	/**
+	 * 保存三方包
+	 * @route POST /packs/threePacks/savePacks
+	 * @group 第三方包管理
+	 * @param {number} id.formData 传入组件id(不传返回标准显示模板)
+	 * @param {string} name.formData 传入组件id(不传返回标准显示模板)
+	 * @param {string} version.formData 传入组件id(不传返回标准显示模板)
+	 * @param {string} url.formData 传入组件id(不传返回标准显示模板)
+	 * @param {string} code.formData 传入组件id(不传返回标准显示模板)
+	 * @returns {Promise} 200 - 返回查询结果
+	 * @returns {Promise} 500 - 返回错误原因
+	 */
+	@routerDec.RequestMapping('/savePacks', MyType.post)
+	async savePacks(
+		@routerDec.RequestParams('Number', 'id') id: number,
+		@routerDec.RequestParams('String', 'name') name: string,
+		@routerDec.RequestParams('String', 'version') version: string,
+		@routerDec.RequestParams('String', 'url') url: string,
+		@routerDec.RequestParams('String', 'code') code: string,
+		@routerDec.Response() res: express.Response
+	): Promise<void> {
+	    const response = new BaseResponse<number>();
+
+	    try {
+		    response._datas = await ThreePacksControl.ThreePacksServices.savePacks(new ThreePacks(id, name, url, version, code), id);
+	        response.changeType(BackType.success);
+	    } catch (e) {
+	        response._msg = BaseErrorMsg.sqlError;
+	    }
+
+	    res.json(response);
+	}
+
 }
 
 export default routerDec;

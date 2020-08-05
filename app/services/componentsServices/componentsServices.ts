@@ -26,7 +26,7 @@ export default class ComponentsServices implements ComponentsServicesImp {
     @RedisDec.CacheEvict('Components', 'getComponentsById', '#Id')
     setComponent(components: Components, Id?: number): Promise<number> {
         if (components.id) {
-            return ComponentsMapper.updateComponents(components).then((r) => r.insertId);
+            return ComponentsMapper.updateComponents(components).then(() => Id);
         } else {
             return ComponentsMapper.setNewComponents(components).then((r) => r.insertId);
         }
