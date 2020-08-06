@@ -15,7 +15,6 @@ class ThreePacksMapper {
      * @returns {Promise<ThreePacks[]>}
      */
     static getThreePacks(name: string): Promise<ThreePacks[]> {
-        console.log(`select * from threePacks where name like %${name}%`);
         return new Promise((resolve, reject) => {
             MySql.query(`select * from threePacks where name like '%${name}%'`)
                 .then((results: ThreePacks[]) => {
