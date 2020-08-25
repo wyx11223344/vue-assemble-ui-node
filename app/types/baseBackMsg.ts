@@ -15,7 +15,8 @@ export enum BaseErrorMsg {
     lessError = 'less渲染失败，请检查less是否有位置参数等问题!',
 
     // npm包生成
-    saveNpmName = '您已经发布过一个这个包了，请进行修改或重新创建新的包'
+    saveNpmName = '您已经发布过一个这个包了，请进行修改或重新创建新的包',
+    publishNpm = '您已经发布过比这个版本高的版本，请输入比当前版本高的版本信息'
 }
 
 export enum BaseSuccessMsg {

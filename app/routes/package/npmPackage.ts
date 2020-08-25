@@ -8,10 +8,12 @@ import * as express from 'express';
 import CodeServices from '../../services/codeServices/codeServices';
 import PublishPackageServices from '../../services/packageServices/npmPackageServices/publishPackageServices';
 import PackageServices from '../../services/packageServices/packageServices';
+import ComponentsServices from '../../services/componentsServices/componentsServices';
 import BaseResponse, {BackType} from '../../models/baseResponse';
 import NpmPublish from '../../models/npmPublish';
 import { BaseErrorMsg, BaseSuccessMsg} from '../../types/baseBackMsg';
 import Codes from '../../models/codes';
+import Components from '../../models/components';
 
 const routerDec: RouterDec = new RouterDec();
 
@@ -20,6 +22,7 @@ export class NpmPackage {
     private static CodeServices: CodeServices = new CodeServices()
     private static PublishPackageServices: PublishPackageServices = new PublishPackageServices()
     private static PackageServices: PackageServices = new PackageServices()
+    private static ComponentsServices: ComponentsServices = new ComponentsServices()
 
     /**
      * 创建新的npm包
@@ -85,22 +88,24 @@ export class NpmPackage {
                 item.version = version;
 
                 if (!await NpmPackage.PackageServices.setNpm(item, item.id)) {
-                    throw BaseErrorMsg.sqlError;
+                    throw BaseErrorMsg.publishNpm;
                 }
 
                 const componentIds: number[] = item.componentsIds.split(',').map((item: string) => Number(item));
 
+                const components: Components[] = await NpmPackage.ComponentsServices.getComponentsByIds(item.componentsIds);
+
                 // 获取代码数组
                 const ComponentsCodes: {[a: string]: Codes[]} = await NpmPackage.CodeServices.getCodesByIds(componentIds);
 
-                if (!await NpmPackage.PublishPackageServices.addNewPackage(item.name, ComponentsCodes, version)) {
+                if (!await NpmPackage.PublishPackageServices.addNewPackage(item.name, ComponentsCodes, version, components)) {
                     throw BaseErrorMsg.redisError;
                 }
             }
 
             response.changeType(BackType.success);
         } catch (e) {
-            response._msg = BaseErrorMsg.sqlError;
+            response._msg = e ? e : BaseErrorMsg.sqlError;
         }
 
         res.send(response);

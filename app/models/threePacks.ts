@@ -4,19 +4,31 @@
  * @Description: 第三方包类
 */
 export default class ThreePacks{
+
 	private _id: number;
 	private _name: string;
 	private _url: string;
 	private _version: string;
 	private _code: string;
+	private _useCode: string;
 
-	constructor(id: number, name: string, url: string, version: string, code: string) {
+	constructor(id: number, name: string, url: string, version: string, code: string, useCode: string) {
 	    this._id = id;
 	    this._name = name;
 	    this._url = url;
 	    this._version = version;
 	    this._code = code;
+	    this._useCode = useCode;
 	}
+
+	get useCode(): string {
+	    return this._useCode;
+	}
+
+	set useCode(value: string) {
+	    this._useCode = value;
+	}
+
 	get id(): number {
 	    return this._id;
 	}

@@ -9,16 +9,21 @@ import * as fs from 'fs';
 import {PublishPackageServicesImp} from './publishPackageServicesImp';
 import MyRedis from '../../../cache';
 import {exec} from 'child_process';
+import Components from '../../../models/components';
+import ThreePacksServices from '../../threePacksServices/threePacksServices';
+import ThreePacks from '../../../models/threePacks';
 
 interface NpmRedisObj {
     componentsObj: { [p: string]: Codes[] };
     path: string;
     version: string;
     name: string;
+    threePacks: string;
 }
 
 export default class PublishPackageServices implements PublishPackageServicesImp{
     private static runningObj: Array<NpmRedisObj> = [];
+    private static ThreePacksServices: ThreePacksServices = new ThreePacksServices()
 
     /**
      * 通过npm id删除npm网络上的npm包
@@ -43,7 +48,7 @@ export default class PublishPackageServices implements PublishPackageServicesImp
      * @param {Object} componentsObj 构成npm包对象
      * @returns {Promise<boolean>}
      */
-    addNewPackage(name: string, componentsObj: { [p: string]: Codes[] }, version: string): Promise<boolean> {
+    addNewPackage(name: string, componentsObj: { [p: string]: Codes[] }, version: string, components: Components[]): Promise<boolean> {
         return new Promise(async (resolve) => {
             try {
                 // 获取基础路径
@@ -53,11 +58,20 @@ export default class PublishPackageServices implements PublishPackageServicesImp
                     componentsObj,
                     path,
                     version,
-                    name
+                    name,
+                    threePacks: Array.from(components.reduce((all, item) => {
+                        if (item.threePacks) {
+                            item.threePacks.split(',').forEach((item) => {
+                                all.add(item);
+                            });
+                        }
+                        return all;
+                    }, new Set())).join(',')
                 }));
                 PublishPackageServices.npmRunFn();
                 resolve(true);
             } catch (e) {
+                console.log(e);
                 resolve(false);
             }
         });
@@ -147,15 +161,19 @@ export default class PublishPackageServices implements PublishPackageServicesImp
      * @param {Object} componentsObj npm包构成对象
      * @returns {string} 生成index.js string
      */
-    private static createMainIndexJs(componentsObj: {[a: string]: Codes[]}): string{
+    private static createMainIndexJs(componentsObj: {[a: string]: Codes[]}, ThreePacks: ThreePacks[]): string{
         let backString = '';
-        let importString = '';
+        let importString = 'import Vue from \'vue\';\n';
         let installStringList = '';
+        let threePacks = '';
+        ThreePacks.forEach((item: ThreePacks) => {
+            threePacks += `${item.useCode}\n`;
+        });
         Object.keys(componentsObj).forEach((key) => {
             importString += `import ${key} from \'../packages/${key}/index\';\n` ;
             installStringList += `${key},\n`;
         });
-        backString = importString +
+        backString = importString + '\n' + threePacks +
 `\nconst Components = [\n${installStringList}];
 
 const install = function(Vue) {
@@ -177,11 +195,11 @@ export default {
      * @param {Object} componentsObj 构成npm项目对象
      * @returns {Promise<boolean>}
      */
-    private static createPackageByObject(path: string, componentsObj: {[a: string]: Codes[]}): Promise<boolean> {
+    private static createPackageByObject(path: string, componentsObj: {[a: string]: Codes[]}, ThreePacks: ThreePacks[]): Promise<boolean> {
         return new Promise((resolve) => {
             let checkCodePromise = 0;
             // 更新index.js
-            fs.writeFileSync(path + '/src/index.js', PublishPackageServices.createMainIndexJs(componentsObj));
+            fs.writeFileSync(path + '/src/index.js', PublishPackageServices.createMainIndexJs(componentsObj, ThreePacks));
             Object.keys(componentsObj).forEach((key: string) => {
                 const item: Codes[] = componentsObj[key];
                 this.createNewPackage(path, key, item).then((results: boolean) => {
@@ -204,13 +222,16 @@ export default {
      * @param {Object} obj 跟新对象
      * @returns {Promise<boolean>}
      */
-    private static packageJsonUpdate(path: string, obj: any): Promise<boolean> {
-        return new Promise((resolve) => {
+    private static packageJsonUpdate(path: string, obj: any, ThreePacks: ThreePacks[]): Promise<boolean> {
+        return new Promise(async (resolve) => {
             if (fs.existsSync(path)) {
                 const data = fs.readFileSync(path + '/package.json').toString();
                 let json = JSON.parse(data);
                 Object.keys(obj).forEach((key) => {
                     json[key] = obj[key];
+                });
+                ThreePacks.forEach((item: ThreePacks) => {
+                    json.dependencies[item.name] = item.version ? `${item.version}` : 'latest';
                 });
                 fs.writeFileSync(path + '/package.json', JSON.stringify(json, null, '\t'), 'utf-8');
                 resolve();
@@ -241,19 +262,21 @@ export default {
 
             this.runningObj.push(dealObject);
 
+            const ThreePacks: ThreePacks[] = await PublishPackageServices.ThreePacksServices.getThreePacksByIds(dealObject.threePacks);
+
             // 创建基础项目
             await this.checkPathExist(dealObject.path);
             await this.downLoadGitTemplate('direct:https://gitee.com/beon/vue-assemble-ui-package', dealObject.path);
 
             // 执行构建项目,更新入口index
-            await this.createPackageByObject(dealObject.path, dealObject.componentsObj);
+            await this.createPackageByObject(dealObject.path, dealObject.componentsObj, ThreePacks);
 
             // 更新package.json文件(未完成)
             const obj = {
                 name: `@wyx962717593/${dealObject.name}`,
                 version: dealObject.version
             };
-            await this.packageJsonUpdate(dealObject.path, obj);
+            await this.packageJsonUpdate(dealObject.path, obj, ThreePacks);
 
             // 开始发布
             await new Promise((resolve) => {
@@ -273,4 +296,3 @@ export default {
     }
 
 }
-

@@ -4,6 +4,7 @@
  * @Description: npm包发布接口定义
 */
 import Codes from '../../../models/codes';
+import Components from '../../../models/components';
 
 export interface PublishPackageServicesImp {
 
@@ -50,5 +51,5 @@ export interface PublishPackageServicesImp {
      * @param {Object} componentsObj 创建对象
      * @param {String} version 版本号
      */
-    addNewPackage(name: string, componentsObj: {[a: string]: Codes[]}, version: string): Promise<boolean>;
+    addNewPackage(name: string, componentsObj: {[a: string]: Codes[]}, version: string, components: Components[]): Promise<boolean>;
 }
