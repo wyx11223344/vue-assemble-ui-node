@@ -1,3 +1,5 @@
+FROM alpine/git
+
 FROM node:alpine
 
 COPY . /home/app

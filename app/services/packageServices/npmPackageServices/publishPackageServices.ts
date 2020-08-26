@@ -163,20 +163,23 @@ export default class PublishPackageServices implements PublishPackageServicesImp
      */
     private static createMainIndexJs(componentsObj: {[a: string]: Codes[]}, ThreePacks: ThreePacks[]): string{
         let backString = '';
-        let importString = 'import Vue from \'vue\';\n';
+        let importString = '';
         let installStringList = '';
-        let threePacks = '';
+        let threePackIm = '';
+        let threePackUse = '';
         ThreePacks.forEach((item: ThreePacks) => {
-            threePacks += `${item.useCode}\n`;
+            threePackIm += `${item.imCode}\n`;
+            threePackUse += `${item.useCode}\n`;
         });
         Object.keys(componentsObj).forEach((key) => {
             importString += `import ${key} from \'../packages/${key}/index\';\n` ;
             installStringList += `${key},\n`;
         });
-        backString = importString + '\n' + threePacks +
+        backString = importString + '\n' + threePackIm +
 `\nconst Components = [\n${installStringList}];
 
 const install = function(Vue) {
+    ${threePackUse}
     Components.forEach((compone) => {
         Vue.use(compone);
     });

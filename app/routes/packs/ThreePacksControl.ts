@@ -88,12 +88,13 @@ export class ThreePacksControl {
 		@routerDec.RequestParams('String', 'url') url: string,
 		@routerDec.RequestParams('String', 'code') code: string,
 		@routerDec.RequestParams('String', 'useCode') useCode: string,
+		@routerDec.RequestParams('String', 'imCode') imCode: string,
 		@routerDec.Response() res: express.Response
 	): Promise<void> {
 	    const response = new BaseResponse<number>();
 
 	    try {
-		    response._datas = await ThreePacksControl.ThreePacksServices.savePacks(new ThreePacks(id, name, url, version, code, useCode), id);
+		    response._datas = await ThreePacksControl.ThreePacksServices.savePacks(new ThreePacks(id, name, url, version, code, useCode, imCode), id);
 	        response.changeType(BackType.success);
 	    } catch (e) {
 	        response._msg = BaseErrorMsg.sqlError;

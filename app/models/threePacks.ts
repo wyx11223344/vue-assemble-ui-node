@@ -11,14 +11,24 @@ export default class ThreePacks{
 	private _version: string;
 	private _code: string;
 	private _useCode: string;
+	private _imCode: string;
 
-	constructor(id: number, name: string, url: string, version: string, code: string, useCode: string) {
+	constructor(id: number, name: string, url: string, version: string, code: string, useCode: string, imCode: string) {
 	    this._id = id;
 	    this._name = name;
 	    this._url = url;
 	    this._version = version;
 	    this._code = code;
 	    this._useCode = useCode;
+	    this._imCode = imCode;
+	}
+
+	get imCode(): string {
+	    return this._imCode;
+	}
+
+	set imCode(value: string) {
+	    this._imCode = value;
 	}
 
 	get useCode(): string {
