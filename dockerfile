@@ -1,5 +1,7 @@
 FROM alpine/git
 
+RUN git status
+
 FROM node:alpine
 
 COPY . /home/app
