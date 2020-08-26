@@ -283,13 +283,35 @@ export default {
 
             // 开始发布
             await new Promise((resolve) => {
-                exec('npm publish --access public', { cwd: dealObject.path }, (error, stdout, stderr) => {
-                    exec(`rm -rf ${dealObject.path}`, () => {
-                        this.runningObj.splice(this.runningObj.findIndex((item) => item.path === dealObject.path), 1);
-                        console.log(error, stdout, stderr);
-                        this.npmRunFn();
-                        resolve();
+                const login = exec('npm adduser', (err) => {
+                    console.log(err);
+                    exec('npm publish --access public', { cwd: dealObject.path }, (error, stdout, stderr) => {
+                        exec(`rm -rf ${dealObject.path}`, () => {
+                            this.runningObj.splice(this.runningObj.findIndex((item) => item.path === dealObject.path), 1);
+                            console.log(error, stdout, stderr);
+                            this.npmRunFn();
+                            resolve();
+                        });
                     });
+                });
+
+                const username = 'wyx962717593';
+                const password = '123321sxy?!';
+                const email = '962717593@qq.com';
+                const inputArray = [
+                    username + '\n',
+                    password + '\n',
+                    email + '\n',
+                ];
+
+                login.stdout.on('data', (data) => {
+                    console.log(data);
+                    var cmd = inputArray.shift();
+                    if (cmd) {
+                        login.stdin.write(cmd);
+                    } else {
+                        login.stdin.end();
+                    }
                 });
             });
         } catch (e) {
