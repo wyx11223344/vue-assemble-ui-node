@@ -9,7 +9,7 @@ import $redisConfig from './config/configRedis';
 
 const redisClient = Redis.createClient($redisConfig);
 
-redisClient.auth('123321sxy?', function () {
+redisClient.auth($redisConfig.password, function () {
     console.log('redis登录成功');
 });
 

@@ -4,14 +4,12 @@
  * @Description: redis基础信息配置
 */
 import * as redis from 'redis';
+import * as fs from 'fs';
 
-const $redisConfig: redis.ClientOpts = {
-
-    host: '127.0.0.1',
-
-    port: 6379
-
-};
+const $redisConfig: redis.ClientOpts = JSON.parse(
+    fs.readFileSync('/run/secrets/assemble-redis')
+        .toString()
+) as redis.ClientOpts;
 
 export const $redisOutTime = {
 

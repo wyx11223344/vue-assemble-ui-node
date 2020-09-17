@@ -4,17 +4,11 @@
  * @Description: mysql基础信息配置
 */
 import * as mysql from 'mysql';
+import * as fs from 'fs';
 
-const $dbConfig: mysql.ConnectionConfig = {
-
-    host: '36.111.183.168', // 这是数据库的地址
-
-    user: 'vueAssemble', // 需要用户的名字
-
-    password: '123321sxy?', // 用户密码 ，如果你没有密码，直接双引号就是
-
-    database: 'vueAssemble' // 数据库名字
-
-};
+const $dbConfig: mysql.ConnectionConfig = JSON.parse(
+    fs.readFileSync('/run/secrets/assemble-mysql')
+        .toString()
+) as mysql.ConnectionConfig;
 
 export default $dbConfig;
